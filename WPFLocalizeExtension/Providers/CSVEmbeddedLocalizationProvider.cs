@@ -219,7 +219,8 @@ namespace WPFLocalizeExtension.Providers
         {
             string ret = null;
 
-            string filename = "";
+            string csvDirectory = "Localization";
+            string csvResourceName = null;
 
             string assembly = "";
             string dictionary = "";
@@ -247,11 +248,33 @@ namespace WPFLocalizeExtension.Providers
                     // check if the name of the assembly is the seached one
                     if (assemblyName.Name == assembly)
                     {
+                        var c = culture;
+                        while (c != CultureInfo.InvariantCulture) {
+                            csvResourceName = string.Format(".{0}.{1}.csv", csvDirectory, dictionary + (String.IsNullOrEmpty(c.Name) ? "" : "-" + c.Name));
+
+                            csvResourceName = assemblyInAppDomain.GetManifestResourceNames().FirstOrDefault(r => r.Contains(csvResourceName));
+                            if (csvResourceName!=null)
+                                break;
+
+                            c = c.Parent;
+                        }
+
+                        if (csvResourceName == null) {
+                            // Take the invariant culture.
+                            csvResourceName = string.Format(".{0}.{1}.csv", csvDirectory, dictionary);
+
+                            csvResourceName = assemblyInAppDomain.GetManifestResourceNames().FirstOrDefault(r => r.Contains(csvResourceName));
+                            //if (csvResourceName == null) {
+                            //    OnProviderError(target, key, "A file for the provided culture " + culture.EnglishName + " does not exist at " + csvResourceName + ".");
+                            //    return null;
+                            //}
+                        }
+
                         //filename = assemblyInAppDomain.GetManifestResourceNames().Where(r => r.Contains(dictionary)).FirstOrDefault();
-                        filename = assemblyInAppDomain.GetManifestResourceNames().Where(r => r.Contains(string.Format("{0}{1}{2}", dictionary, string.IsNullOrEmpty(culture.Name) ? "" : "-", culture.Name))).FirstOrDefault();
-                        if (filename != null)
+                        //filename = assemblyInAppDomain.GetManifestResourceNames().Where(r => r.Contains(string.Format("{0}{1}{2}", dictionary, string.IsNullOrEmpty(culture.Name) ? "" : "-", culture.Name))).FirstOrDefault();
+                        if (csvResourceName != null)
                         {
-                            using (StreamReader reader = new StreamReader(assemblyInAppDomain.GetManifestResourceStream(filename), Encoding.Default))
+                            using (StreamReader reader = new StreamReader(assemblyInAppDomain.GetManifestResourceStream(csvResourceName), Encoding.Default))
                             {
                                 if (this.HasHeader && !reader.EndOfStream)
                                     reader.ReadLine();
@@ -281,7 +304,7 @@ namespace WPFLocalizeExtension.Providers
 
             // Nothing found -> Raise the error message.
             if (ret == null)
-                OnProviderError(target, key, "The key does not exist in " + filename + ".");
+                OnProviderError(target, key, "The key does not exist in " + csvResourceName + ".");
 
             return ret;
         }

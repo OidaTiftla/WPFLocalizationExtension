@@ -45,7 +45,32 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="args">The event argument.</param>
         private static void AttachedPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
+            UpdateAvailableCultures(obj);
             Instance.OnProviderChanged(obj);
+        }
+
+        /// <summary>
+        /// Searches for all available cultures and adds them to the list.
+        /// </summary>
+        /// <param name="target"></param>
+        private static void UpdateAvailableCultures(DependencyObject target)
+        {
+            var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+
+            var csvDirectory = "Localization";
+            var dictionary = Instance.GetDictionary(target);
+            var csvPath = "";
+            // search all available cultures
+            foreach (var c in cultures) {
+                csvPath = Path.Combine(csvDirectory, dictionary + (String.IsNullOrEmpty(c.Name) ? "" : "." + c.Name) + ".csv");
+                if (File.Exists(csvPath))
+                    Instance.AddCulture(c);
+            }
+
+            // add culture invariant
+            csvPath = Path.Combine(csvDirectory, dictionary + ".csv");
+            if (File.Exists(csvPath))
+                Instance.AddCulture(CultureInfo.InvariantCulture);
         }
         #endregion
 

@@ -1,11 +1,13 @@
 ﻿#region Copyright information
+
 // <copyright file="LocalizeDictionary.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Bernhard Millauer</author>
 // <author>Uwe Mayer</author>
-#endregion
+
+#endregion Copyright information
 
 using System.Windows.Markup;
 
@@ -18,9 +20,12 @@ using System.Windows.Markup;
 // Assign a default namespace prefix for the schema
 [assembly: XmlnsPrefix("http://wpflocalizeextension.codeplex.com", "lex")]
 
-namespace WPFLocalizeExtension.Engine
-{
+namespace WPFLocalizeExtension.Engine {
+
     #region Uses
+
+    using Extensions;
+    using Providers;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -31,18 +36,18 @@ namespace WPFLocalizeExtension.Engine
     using System.Threading;
     using System.Windows;
     using System.Windows.Input;
-    using Extensions;
-    using Providers;
-    using XAMLMarkupExtensions.Base;
     using System.Windows.Threading;
-    #endregion
+    using XAMLMarkupExtensions.Base;
+
+    #endregion Uses
 
     /// <summary>
     /// Represents the culture interface for localization
     /// </summary>
-    public sealed class LocalizeDictionary : DependencyObject, INotifyPropertyChanged
-    {
+    public sealed class LocalizeDictionary : DependencyObject, INotifyPropertyChanged {
+
         #region INotifyPropertyChanged Implementation
+
         /// <summary>
         /// Informiert über sich ändernde Eigenschaften.
         /// </summary>
@@ -54,14 +59,15 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="property">
         /// The property that changed
         /// </param>
-        internal void RaisePropertyChanged(string property)
-        {
+        internal void RaisePropertyChanged(string property) {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(property));
         }
-        #endregion
+
+        #endregion INotifyPropertyChanged Implementation
 
         #region Dependency Properties
+
         /// <summary>
         /// <see cref="DependencyProperty"/> DefaultProvider to set the default ILocalizationProvider.
         /// </summary>
@@ -133,9 +139,11 @@ namespace WPFLocalizeExtension.Engine
                 typeof(bool),
                 typeof(LocalizeDictionary),
                 new PropertyMetadata(false, SetOutputMissingKeysFromDependencyProperty));
-        #endregion
+
+        #endregion Dependency Properties
 
         #region Dependency Property Callbacks
+
         /// <summary>
         /// Callback function. Used to set the <see cref="LocalizeDictionary"/>.Culture if set in Xaml.
         /// Only supported at DesignTime.
@@ -143,19 +151,15 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
         [DesignOnly(true)]
-        private static void SetCultureFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void SetCultureFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             if (!Instance.GetIsInDesignMode())
                 return;
 
             CultureInfo culture;
 
-            try
-            {
+            try {
                 culture = new CultureInfo((string)args.NewValue);
-            }
-            catch
-            {
+            } catch {
                 if (Instance.GetIsInDesignMode())
                     culture = DefaultCultureInfo;
                 else
@@ -171,14 +175,12 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void SetProviderFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void SetProviderFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             LocalizeDictionary.DictionaryEvent.Invoke(obj, new DictionaryEventArgs(DictionaryEventType.ProviderChanged, args.NewValue));
 
             var oldProvider = args.OldValue as ILocalizationProvider;
 
-            if (oldProvider != null)
-            {
+            if (oldProvider != null) {
                 oldProvider.ProviderChanged -= new ProviderChangedEventHandler(ProviderUpdated);
                 oldProvider.ValueChanged -= new ValueChangedEventHandler(ValueChanged);
                 oldProvider.AvailableCultures.CollectionChanged -= new NotifyCollectionChangedEventHandler(Instance.AvailableCulturesCollectionChanged);
@@ -186,8 +188,7 @@ namespace WPFLocalizeExtension.Engine
 
             var provider = args.NewValue as ILocalizationProvider;
 
-            if (provider != null)
-            {
+            if (provider != null) {
                 provider.ProviderChanged += new ProviderChangedEventHandler(ProviderUpdated);
                 provider.ValueChanged += new ValueChangedEventHandler(ValueChanged);
                 provider.AvailableCultures.CollectionChanged += new NotifyCollectionChangedEventHandler(Instance.AvailableCulturesCollectionChanged);
@@ -198,13 +199,11 @@ namespace WPFLocalizeExtension.Engine
             }
         }
 
-        private static void ProviderUpdated(object sender, ProviderChangedEventArgs args)
-        {
+        private static void ProviderUpdated(object sender, ProviderChangedEventArgs args) {
             LocalizeDictionary.DictionaryEvent.Invoke(args.Object, new DictionaryEventArgs(DictionaryEventType.ProviderUpdated, sender));
         }
 
-        private static void ValueChanged(object sender, ValueChangedEventArgs args)
-        {
+        private static void ValueChanged(object sender, ValueChangedEventArgs args) {
             LocalizeDictionary.DictionaryEvent.Invoke(null, new DictionaryEventArgs(DictionaryEventType.ValueChanged, args));
         }
 
@@ -213,8 +212,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void SetDefaultProviderFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void SetDefaultProviderFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             if (args.NewValue is ILocalizationProvider)
                 Instance.DefaultProvider = (ILocalizationProvider)args.NewValue;
         }
@@ -224,8 +222,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void SetSeparationFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void SetSeparationFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
         }
 
         /// <summary>
@@ -233,8 +230,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void SetIncludeInvariantCultureFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void SetIncludeInvariantCultureFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             if (args.NewValue is bool)
                 Instance.IncludeInvariantCulture = (bool)args.NewValue;
         }
@@ -244,8 +240,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void SetDisableCacheFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void SetDisableCacheFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             if (args.NewValue is bool)
                 Instance.DisableCache = (bool)args.NewValue;
         }
@@ -255,22 +250,23 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void SetOutputMissingKeysFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void SetOutputMissingKeysFromDependencyProperty(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             if (args.NewValue is bool)
                 Instance.OutputMissingKeys = (bool)args.NewValue;
         }
-        #endregion
+
+        #endregion Dependency Property Callbacks
 
         #region Dependency Property Management
+
         #region Get
+
         /// <summary>
         /// Getter of <see cref="DependencyProperty"/> Provider.
         /// </summary>
         /// <param name="obj">The dependency object to get the provider from.</param>
         /// <returns>The provider.</returns>
-        public static ILocalizationProvider GetProvider(DependencyObject obj)
-        {
+        public static ILocalizationProvider GetProvider(DependencyObject obj) {
             return obj.GetValueSync<ILocalizationProvider>(ProviderProperty);
         }
 
@@ -279,8 +275,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object to get the default provider from.</param>
         /// <returns>The default provider.</returns>
-        public static ILocalizationProvider GetDefaultProvider(DependencyObject obj)
-        {
+        public static ILocalizationProvider GetDefaultProvider(DependencyObject obj) {
             return Instance.DefaultProvider;
         }
 
@@ -289,8 +284,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="target">The target object for context.</param>
         /// <returns>The separation of the given context or the default.</returns>
-        public static string GetSeparation(DependencyObject target)
-        {
+        public static string GetSeparation(DependencyObject target) {
             return Instance.Separation;
         }
 
@@ -299,8 +293,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="target">The target object for context.</param>
         /// <returns>The flag.</returns>
-        public static bool GetIncludeInvariantCulture(DependencyObject target)
-        {
+        public static bool GetIncludeInvariantCulture(DependencyObject target) {
             return Instance.IncludeInvariantCulture;
         }
 
@@ -309,8 +302,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="target">The target object for context.</param>
         /// <returns>The flag.</returns>
-        public static bool GetDisableCache(DependencyObject target)
-        {
+        public static bool GetDisableCache(DependencyObject target) {
             return Instance.DisableCache;
         }
 
@@ -319,8 +311,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="target">The target object for context.</param>
         /// <returns>The flag.</returns>
-        public static bool GetOutputMissingKeys(DependencyObject target)
-        {
+        public static bool GetOutputMissingKeys(DependencyObject target) {
             return Instance.OutputMissingKeys;
         }
 
@@ -332,23 +323,23 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="obj">The dependency object to get the design culture from.</param>
         /// <returns>The design culture at design time or the current culture at runtime.</returns>
         [DesignOnly(true)]
-        public static string GetDesignCulture(DependencyObject obj)
-        {
+        public static string GetDesignCulture(DependencyObject obj) {
             if (Instance.GetIsInDesignMode())
                 return obj.GetValueSync<string>(DesignCultureProperty);
             else
                 return Instance.Culture.ToString();
         }
-        #endregion
+
+        #endregion Get
 
         #region Set
+
         /// <summary>
         /// Setter of <see cref="DependencyProperty"/> Provider.
         /// </summary>
         /// <param name="obj">The dependency object to set the provider to.</param>
         /// <param name="value">The provider.</param>
-        public static void SetProvider(DependencyObject obj, ILocalizationProvider value)
-        {
+        public static void SetProvider(DependencyObject obj, ILocalizationProvider value) {
             obj.SetValueSync(ProviderProperty, value);
         }
 
@@ -357,8 +348,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object to set the default provider to.</param>
         /// <param name="value">The default provider.</param>
-        public static void SetDefaultProvider(DependencyObject obj, ILocalizationProvider value)
-        {
+        public static void SetDefaultProvider(DependencyObject obj, ILocalizationProvider value) {
             Instance.DefaultProvider = value;
         }
 
@@ -367,8 +357,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object to set the separation to.</param>
         /// <param name="value">The separation.</param>
-        public static void SetSeparation(DependencyObject obj, string value)
-        {
+        public static void SetSeparation(DependencyObject obj, string value) {
             Instance.Separation = value;
         }
 
@@ -377,8 +366,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object to set the separation to.</param>
         /// <param name="value">The flag.</param>
-        public static void SetIncludeInvariantCulture(DependencyObject obj, bool value)
-        {
+        public static void SetIncludeInvariantCulture(DependencyObject obj, bool value) {
             Instance.IncludeInvariantCulture = value;
         }
 
@@ -387,8 +375,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object to set the separation to.</param>
         /// <param name="value">The flag.</param>
-        public static void SetDisableCache(DependencyObject obj, bool value)
-        {
+        public static void SetDisableCache(DependencyObject obj, bool value) {
             Instance.DisableCache = value;
         }
 
@@ -397,8 +384,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="obj">The dependency object to set the separation to.</param>
         /// <param name="value">The flag.</param>
-        public static void SetOutputMissingKeys(DependencyObject obj, bool value)
-        {
+        public static void SetOutputMissingKeys(DependencyObject obj, bool value) {
             Instance.OutputMissingKeys = value;
         }
 
@@ -409,15 +395,17 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="obj">The dependency object to set the culture to.</param>
         /// <param name="value">The value.</param>
         [DesignOnly(true)]
-        public static void SetDesignCulture(DependencyObject obj, string value)
-        {
+        public static void SetDesignCulture(DependencyObject obj, string value) {
             if (Instance.GetIsInDesignMode())
                 obj.SetValueSync(DesignCultureProperty, value);
         }
-        #endregion
-        #endregion
+
+        #endregion Set
+
+        #endregion Dependency Property Management
 
         #region Variables
+
         /// <summary>
         /// Holds a SyncRoot to be thread safe
         /// </summary>
@@ -472,36 +460,31 @@ namespace WPFLocalizeExtension.Engine
         /// A dictionary for notification classes for changes of the individual target Parent changes.
         /// </summary>
         private ParentNotifiers parentNotifiers = new ParentNotifiers();
-        #endregion
+
+        #endregion Variables
 
         #region Constructor
+
         /// <summary>
         /// Prevents a default instance of the <see cref="LocalizeDictionary"/> class from being created.
         /// Static Constructor
         /// </summary>
-        private LocalizeDictionary()
-        {
+        private LocalizeDictionary() {
             this.DefaultProvider = ResxLocalizationProvider.Instance;
             this.SetCultureCommand = new CultureInfoDelegateCommand(SetCulture);
         }
 
-        private void AvailableCulturesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            this.Dispatcher.BeginInvoke(new Action<NotifyCollectionChangedEventArgs>((args) =>
-            {
-                if (args.NewItems != null)
-                {
-                    foreach (CultureInfo c in args.NewItems)
-                    {
+        private void AvailableCulturesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+            this.Dispatcher.BeginInvoke(new Action<NotifyCollectionChangedEventArgs>((args) => {
+                if (args.NewItems != null) {
+                    foreach (CultureInfo c in args.NewItems) {
                         if (!this.MergedAvailableCultures.Contains(c))
                             this.MergedAvailableCultures.Add(c);
                     }
                 }
 
-                if (args.OldItems != null)
-                {
-                    foreach (CultureInfo c in args.OldItems)
-                    {
+                if (args.OldItems != null) {
+                    foreach (CultureInfo c in args.OldItems) {
                         if (this.MergedAvailableCultures.Contains(c))
                             this.MergedAvailableCultures.Remove(c);
                     }
@@ -515,28 +498,27 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Destructor code.
         /// </summary>
-        ~LocalizeDictionary()
-        {
+        ~LocalizeDictionary() {
             LocExtension.ClearResourceBuffer();
             FELoc.ClearResourceBuffer();
             BLoc.ClearResourceBuffer();
         }
-        #endregion
+
+        #endregion Constructor
 
         #region Static Properties
+
         /// <summary>
         /// Gets the default <see cref="CultureInfo"/> to initialize the <see cref="LocalizeDictionary"/>.<see cref="CultureInfo"/>
         /// </summary>
-        public static CultureInfo DefaultCultureInfo
-        {
+        public static CultureInfo DefaultCultureInfo {
             get { return CultureInfo.InvariantCulture; }
         }
 
         /// <summary>
         /// Gets the default separation char/string.
         /// </summary>
-        public static string DefaultSeparation
-        {
+        public static string DefaultSeparation {
             get { return "_"; }
         }
 
@@ -544,21 +526,16 @@ namespace WPFLocalizeExtension.Engine
         /// Gets the <see cref="LocalizeDictionary"/> singleton.
         /// If the underlying instance is null, a instance will be created.
         /// </summary>
-        public static LocalizeDictionary Instance
-        {
-            get
-            {
+        public static LocalizeDictionary Instance {
+            get {
                 // check if the underlying instance is null
-                if (instance == null)
-                {
+                if (instance == null) {
                     // if it is null, lock the syncroot.
-                    // if another thread is accessing this too, 
+                    // if another thread is accessing this too,
                     // it have to wait until the syncroot is released
-                    lock (SyncRoot)
-                    {
+                    lock (SyncRoot) {
                         // check again, if the underlying instance is null
-                        if (instance == null)
-                        {
+                        if (instance == null) {
                             // create a new instance
                             instance = new LocalizeDictionary();
                         }
@@ -573,34 +550,32 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Gets the culture of the singleton instance.
         /// </summary>
-        public static CultureInfo CurrentCulture
-        {
+        public static CultureInfo CurrentCulture {
             get { return Instance.Culture; }
         }
-        #endregion
+
+        #endregion Static Properties
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the <see cref="CultureInfo"/> for localization.
         /// On set, <see cref="LocalizeDictionary.DictionaryEvent"/> is raised.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">
-        /// You have to set <see cref="LocalizeDictionary"/>.Culture first or 
+        /// You have to set <see cref="LocalizeDictionary"/>.Culture first or
         /// wait until System.Windows.Application.Current.MainWindow is created.
         /// Otherwise you will get an Exception.</exception>
         /// <exception cref="System.ArgumentNullException">thrown if Culture will be set to null</exception>
-        public CultureInfo Culture
-        {
-            get
-            {
+        public CultureInfo Culture {
+            get {
                 if (this.culture == null)
                     this.culture = DefaultCultureInfo;
 
                 return this.culture;
             }
 
-            set
-            {
+            set {
                 // the cultureinfo cannot contain a null reference
                 if (value == null)
                     value = DefaultCultureInfo;
@@ -608,42 +583,34 @@ namespace WPFLocalizeExtension.Engine
                 // Let's see if we already got this culture
                 var newCulture = value;
 
-                if (!GetIsInDesignMode())
-                {
+                if (!GetIsInDesignMode()) {
                     foreach (var c in this.MergedAvailableCultures)
                         if (c == CultureInfo.InvariantCulture && !this.IncludeInvariantCulture)
                             continue;
-                        else if (c.Name == value.Name)
-                        {
+                        else if (c.Name == value.Name) {
                             newCulture = c;
                             break;
-                        }
-                        else if (c.Parent.Name == value.Name)
-                        {
+                        } else if (c.Parent.Name == value.Name) {
                             // We found a parent culture, but continue - maybe there is a specific one available too.
                             newCulture = c;
-                        }
-                        else if (value.Parent.Name == c.Name)
-                        {
+                        } else if (value.Parent.Name == c.Name) {
                             // We found a parent culture, but continue - maybe there is a specific one available too.
                             newCulture = value;
                         }
                 }
 
-                if (culture != newCulture)
-                {
+                if (culture != newCulture) {
                     if (newCulture != null && !this.MergedAvailableCultures.Contains(newCulture))
                         this.MergedAvailableCultures.Add(newCulture);
 
                     culture = newCulture;
 
                     // Change the CurrentThread culture if needed.
-                    if (setCurrentThreadCulture && !this.GetIsInDesignMode())
-                    {
+                    if (setCurrentThreadCulture && !this.GetIsInDesignMode()) {
                         Thread.CurrentThread.CurrentCulture = culture;
                         Thread.CurrentThread.CurrentUICulture = culture;
                     }
-                    
+
                     // Raise the OnLocChanged event
                     LocalizeDictionary.DictionaryEvent.Invoke(null, new DictionaryEventArgs(DictionaryEventType.CultureChanged, value));
 
@@ -655,34 +622,28 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Gets or sets a flag that determines, if the CurrentThread culture should be changed along with the Culture property.
         /// </summary>
-        public bool SetCurrentThreadCulture
-        {
+        public bool SetCurrentThreadCulture {
             get { return setCurrentThreadCulture; }
-            set
-            {
-                if (setCurrentThreadCulture != value)
-                {
+            set {
+                if (setCurrentThreadCulture != value) {
                     setCurrentThreadCulture = value;
                     RaisePropertyChanged("SetCurrentThreadCulture");
                 }
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the flag indicating if the invariant culture is included in the <see cref="LocalizeDictionary.MergedAvailableCultures"/> list.
         /// </summary>
-        public bool IncludeInvariantCulture
-        {
+        public bool IncludeInvariantCulture {
             get { return includeInvariantCulture; }
-            set
-            {
-                if (includeInvariantCulture != value)
-                {
+            set {
+                if (includeInvariantCulture != value) {
                     includeInvariantCulture = value;
 
                     var c = CultureInfo.InvariantCulture;
                     var existing = this.MergedAvailableCultures.Contains(c);
-                    
+
                     if (includeInvariantCulture && !existing)
                         this.MergedAvailableCultures.Insert(0, c);
                     else if (!includeInvariantCulture && existing && this.MergedAvailableCultures.Count > 1)
@@ -694,13 +655,10 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Gets or sets the flag that disables the cache.
         /// </summary>
-        public bool DisableCache
-        {
+        public bool DisableCache {
             get { return disableCache; }
-            set
-            {
-                if (disableCache != value)
-                {
+            set {
+                if (disableCache != value) {
                     disableCache = value;
                 }
             }
@@ -709,13 +667,10 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Gets or sets the flag that controls the output of missing keys.
         /// </summary>
-        public bool OutputMissingKeys
-        {
+        public bool OutputMissingKeys {
             get { return outputMissingKeys; }
-            set
-            {
-                if (outputMissingKeys != value)
-                {
+            set {
+                if (outputMissingKeys != value) {
                     outputMissingKeys = value;
                 }
             }
@@ -724,11 +679,9 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// The separation char for automatic key retrieval.
         /// </summary>
-        public string Separation
-        {
+        public string Separation {
             get { return separation; }
-            set
-            {
+            set {
                 separation = value;
                 LocalizeDictionary.DictionaryEvent.Invoke(null, new DictionaryEventArgs(DictionaryEventType.SeparationChanged, value));
             }
@@ -737,15 +690,11 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Gets or sets the default <see cref="ILocalizationProvider"/>.
         /// </summary>
-        public ILocalizationProvider DefaultProvider
-        {
+        public ILocalizationProvider DefaultProvider {
             get { return defaultProvider; }
-            set
-            {
-                if (defaultProvider != value)
-                {
-                    if (defaultProvider != null)
-                    {
+            set {
+                if (defaultProvider != value) {
+                    if (defaultProvider != null) {
                         defaultProvider.ProviderChanged -= new ProviderChangedEventHandler(ProviderUpdated);
                         defaultProvider.ValueChanged -= new ValueChangedEventHandler(ValueChanged);
                         defaultProvider.AvailableCultures.CollectionChanged -= new NotifyCollectionChangedEventHandler(AvailableCulturesCollectionChanged);
@@ -753,14 +702,12 @@ namespace WPFLocalizeExtension.Engine
 
                     defaultProvider = value;
 
-                    if (defaultProvider != null)
-                    {
+                    if (defaultProvider != null) {
                         defaultProvider.ProviderChanged += new ProviderChangedEventHandler(ProviderUpdated);
                         defaultProvider.ValueChanged += new ValueChangedEventHandler(ValueChanged);
                         defaultProvider.AvailableCultures.CollectionChanged += new NotifyCollectionChangedEventHandler(AvailableCulturesCollectionChanged);
 
-                        foreach (CultureInfo c in defaultProvider.AvailableCultures)
-                        {
+                        foreach (CultureInfo c in defaultProvider.AvailableCultures) {
                             if (!this.MergedAvailableCultures.Contains(c))
                                 this.MergedAvailableCultures.Add(c);
                         }
@@ -774,12 +721,9 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Gets the merged list of all available cultures.
         /// </summary>
-        public ObservableCollection<CultureInfo> MergedAvailableCultures
-        {
-            get
-            {
-                if (mergedAvailableCultures == null)
-                {
+        public ObservableCollection<CultureInfo> MergedAvailableCultures {
+            get {
+                if (mergedAvailableCultures == null) {
                     mergedAvailableCultures = new ObservableCollection<CultureInfo>();
                     mergedAvailableCultures.Add(CultureInfo.InvariantCulture);
                     mergedAvailableCultures.CollectionChanged += (s, e) => { this.Culture = this.Culture; };
@@ -797,19 +741,19 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Gets the specific <see cref="CultureInfo"/> of the current culture.
         /// This can be used for format manners.
-        /// If the Culture is an invariant <see cref="CultureInfo"/>, 
+        /// If the Culture is an invariant <see cref="CultureInfo"/>,
         /// SpecificCulture will also return an invariant <see cref="CultureInfo"/>.
         /// </summary>
-        public CultureInfo SpecificCulture
-        {
-            get
-            {
+        public CultureInfo SpecificCulture {
+            get {
                 return CultureInfo.CreateSpecificCulture(this.Culture.ToString());
             }
-        } 
-        #endregion
+        }
+
+        #endregion Properties
 
         #region Localization Core
+
         /// <summary>
         /// Get the localized object using the built-in ResxLocalizationProvider.
         /// </summary>
@@ -818,11 +762,10 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="key">The key to the value.</param>
         /// <param name="culture">The culture to use.</param>
         /// <returns>The value corresponding to the source/dictionary/key path for the given culture (otherwise NULL).</returns>
-        public object GetLocalizedObject(string source, string dictionary, string key, CultureInfo culture)
-        {
+        public object GetLocalizedObject(string source, string dictionary, string key, CultureInfo culture) {
             return GetLocalizedObject(source + ":" + dictionary + ":" + key, null, culture, this.DefaultProvider);
         }
-        
+
         /// <summary>
         /// Get the localized object using the given target for context information.
         /// </summary>
@@ -830,11 +773,10 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="target">The target <see cref="DependencyObject"/>.</param>
         /// <param name="culture">The culture to use.</param>
         /// <returns>The value corresponding to the source/dictionary/key path for the given culture (otherwise NULL).</returns>
-        public object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture)
-        {
+        public object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture) {
             if (this.DefaultProvider is InheritingResxLocalizationProvider)
                 return GetLocalizedObject(key, target, culture, this.DefaultProvider);
-                
+
             var provider = target != null ? target.GetValue(GetProvider) : null;
 
             if (provider == null)
@@ -851,8 +793,7 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="culture">The culture to use.</param>
         /// <param name="provider">The provider to use.</param>
         /// <returns>The value corresponding to the source/dictionary/key path for the given culture (otherwise NULL).</returns>
-        public object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture, ILocalizationProvider provider)
-        {
+        public object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture, ILocalizationProvider provider) {
             if (provider == null)
                 throw new InvalidOperationException("No provider found and no default provider given.");
 
@@ -865,8 +806,7 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="key">Key used as a base to find the full key</param>
         /// <param name="target">Target used to help determine key information</param>
         /// <returns>Returns an object with all possible pieces of the given key (Assembly, Dictionary, Key)</returns>
-        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(string key, DependencyObject target)
-        {
+        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(string key, DependencyObject target) {
             if (this.DefaultProvider is InheritingResxLocalizationProvider)
                 return GetFullyQualifiedResourceKey(key, target, this.DefaultProvider);
 
@@ -885,8 +825,7 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="target">Target used to help determine key information</param>
         /// <param name="provider">Provider to use</param>
         /// <returns>Returns an object with all possible pieces of the given key (Assembly, Dictionary, Key)</returns>
-        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(String key, DependencyObject target, ILocalizationProvider provider)
-        {
+        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(String key, DependencyObject target, ILocalizationProvider provider) {
             if (provider == null)
                 throw new InvalidOperationException("No provider found and no default provider given.");
 
@@ -894,7 +833,7 @@ namespace WPFLocalizeExtension.Engine
         }
 
         /// <summary>
-        /// Looks up the ResourceManagers for the searched <paramref name="resourceKey"/> 
+        /// Looks up the ResourceManagers for the searched <paramref name="resourceKey"/>
         /// in the <paramref name="resourceDictionary"/> in the <paramref name="resourceAssembly"/>
         /// with an Invariant Culture.
         /// </summary>
@@ -904,8 +843,7 @@ namespace WPFLocalizeExtension.Engine
         /// <returns>
         /// TRUE if the searched one is found, otherwise FALSE
         /// </returns>
-        public bool ResourceKeyExists(string resourceAssembly, string resourceDictionary, string resourceKey)
-        {
+        public bool ResourceKeyExists(string resourceAssembly, string resourceDictionary, string resourceKey) {
             return ResourceKeyExists(resourceAssembly, resourceDictionary, resourceKey, CultureInfo.InvariantCulture);
         }
 
@@ -922,8 +860,7 @@ namespace WPFLocalizeExtension.Engine
         /// <returns>
         /// TRUE if the searched one is found, otherwise FALSE
         /// </returns>
-        public bool ResourceKeyExists(string resourceAssembly, string resourceDictionary, string resourceKey, CultureInfo cultureToUse)
-        {
+        public bool ResourceKeyExists(string resourceAssembly, string resourceDictionary, string resourceKey, CultureInfo cultureToUse) {
             var provider = ResxLocalizationProvider.Instance;
 
             return ResourceKeyExists(resourceAssembly + ":" + resourceDictionary + ":" + resourceKey, cultureToUse, provider);
@@ -940,50 +877,46 @@ namespace WPFLocalizeExtension.Engine
         /// <returns>
         /// TRUE if the searched one is found, otherwise FALSE
         /// </returns>
-        public bool ResourceKeyExists(string key, CultureInfo cultureToUse, ILocalizationProvider provider)
-        {
+        public bool ResourceKeyExists(string key, CultureInfo cultureToUse, ILocalizationProvider provider) {
             return provider.GetLocalizedObject(key, null, cultureToUse) != null;
         }
-        #endregion
+
+        #endregion Localization Core
 
         #region Helper Functions
+
         /// <summary>
         /// Gets the status of the design mode
         /// </summary>
         /// <returns>TRUE if in design mode, else FALSE</returns>
-        public bool GetIsInDesignMode()
-        {
-            lock (SyncRoot)
-            {
+        public bool GetIsInDesignMode() {
+            lock (SyncRoot) {
                 if (_isInDesignMode.HasValue)
                     return _isInDesignMode.Value;
 
-                if (this.Dispatcher == null || this.Dispatcher.Thread == null || !this.Dispatcher.Thread.IsAlive)
-                {
+                if (this.Dispatcher == null || this.Dispatcher.Thread == null || !this.Dispatcher.Thread.IsAlive) {
                     _isInDesignMode = false;
                     return _isInDesignMode.Value;
                 }
 
-                if (!this.Dispatcher.CheckAccess())
-                {
-                    try
-                    {
+                if (!this.Dispatcher.CheckAccess()) {
+                    try {
                         _isInDesignMode = (bool)this.Dispatcher.Invoke(DispatcherPriority.Normal, TimeSpan.FromMilliseconds(100), new Func<bool>(this.GetIsInDesignMode));
-                    }
-                    catch (Exception)
-                    {
+                    } catch (Exception) {
                         _isInDesignMode = default(bool);
                     }
-                    
+
                     return _isInDesignMode.Value;
                 }
                 _isInDesignMode = DesignerProperties.GetIsInDesignMode(this);
                 return _isInDesignMode.Value;
             }
         }
-        #endregion
+
+        #endregion Helper Functions
 
         #region MissingKeyEvent (standard event)
+
         /// <summary>
         /// An event for missing keys.
         /// </summary>
@@ -995,8 +928,7 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="sender">The sender of the event.</param>
         /// <param name="key">The missing key.</param>
         /// <returns>True, if a reload should be performed.</returns>
-        internal bool OnNewMissingKeyEvent(object sender, string key)
-        {
+        internal bool OnNewMissingKeyEvent(object sender, string key) {
             var args = new MissingKeyEventArgs(key);
 
             if (MissingKeyEvent != null)
@@ -1004,15 +936,18 @@ namespace WPFLocalizeExtension.Engine
 
             return args.Reload;
         }
-        #endregion
+
+        #endregion MissingKeyEvent (standard event)
 
         #region DictionaryEvent (using weak references)
-        internal static class DictionaryEvent
-        {
+
+        internal static class DictionaryEvent {
+
             /// <summary>
             /// The list of listeners
             /// </summary>
             private static List<WeakReference> listeners = new List<WeakReference>();
+
             private static object listenersLock = new object();
 
             /// <summary>
@@ -1020,14 +955,11 @@ namespace WPFLocalizeExtension.Engine
             /// </summary>
             /// <param name="sender">The sender of the event.</param>
             /// <param name="args">The event arguments.</param>
-            internal static void Invoke(DependencyObject sender, DictionaryEventArgs args)
-            {
+            internal static void Invoke(DependencyObject sender, DictionaryEventArgs args) {
                 var list = new List<IDictionaryEventListener>();
 
-                lock (listenersLock)
-                {
-                    foreach (var wr in listeners.ToList())
-                    {
+                lock (listenersLock) {
+                    foreach (var wr in listeners.ToList()) {
                         var targetReference = wr.Target;
                         if (targetReference != null)
                             list.Add((IDictionaryEventListener)targetReference);
@@ -1044,18 +976,15 @@ namespace WPFLocalizeExtension.Engine
             /// Adds a listener to the inner list of listeners.
             /// </summary>
             /// <param name="listener">The listener to add.</param>
-            internal static void AddListener(IDictionaryEventListener listener)
-            {
+            internal static void AddListener(IDictionaryEventListener listener) {
                 if (listener == null)
                     return;
 
                 // Check, if this listener already was added.
                 bool listenerExists = false;
 
-                lock (listenersLock)
-                {
-                    foreach (var wr in listeners.ToList())
-                    {
+                lock (listenersLock) {
+                    foreach (var wr in listeners.ToList()) {
                         var targetReference = wr.Target;
                         if (targetReference == null)
                             listeners.Remove(wr);
@@ -1073,15 +1002,12 @@ namespace WPFLocalizeExtension.Engine
             /// Removes a listener from the inner list of listeners.
             /// </summary>
             /// <param name="listener">The listener to remove.</param>
-            internal static void RemoveListener(IDictionaryEventListener listener)
-            {
+            internal static void RemoveListener(IDictionaryEventListener listener) {
                 if (listener == null)
                     return;
 
-                lock (listenersLock)
-                {
-                    foreach (var wr in listeners.ToList())
-                    {
+                lock (listenersLock) {
+                    foreach (var wr in listeners.ToList()) {
                         var targetReference = wr.Target;
                         if (targetReference == null)
                             listeners.Remove(wr);
@@ -1096,12 +1022,9 @@ namespace WPFLocalizeExtension.Engine
             /// </summary>
             /// <typeparam name="T">The listener type.</typeparam>
             /// <returns>An enumeration of listeners.</returns>
-            internal static IEnumerable<T> EnumerateListeners<T>()
-            {
-                lock (listenersLock)
-                {
-                    foreach (var wr in listeners.ToList())
-                    {
+            internal static IEnumerable<T> EnumerateListeners<T>() {
+                lock (listenersLock) {
+                    foreach (var wr in listeners.ToList()) {
                         var targetReference = wr.Target;
                         if (targetReference == null)
                             listeners.Remove(wr);
@@ -1111,20 +1034,22 @@ namespace WPFLocalizeExtension.Engine
                 }
             }
         }
-        #endregion
+
+        #endregion DictionaryEvent (using weak references)
 
         #region CultureInfoDelegateCommand
-        private void SetCulture(CultureInfo c)
-        {
+
+        private void SetCulture(CultureInfo c) {
             this.Culture = c;
         }
 
         /// <summary>
         /// A class for culture commands.
         /// </summary>
-        internal class CultureInfoDelegateCommand : ICommand
-        {
+        internal class CultureInfoDelegateCommand : ICommand {
+
             #region Functions for execution and evaluation
+
             /// <summary>
             /// Predicate that determines if an object can execute
             /// </summary>
@@ -1134,23 +1059,24 @@ namespace WPFLocalizeExtension.Engine
             /// The action to execute when the command is invoked
             /// </summary>
             private readonly Action<CultureInfo> execute;
-            #endregion
+
+            #endregion Functions for execution and evaluation
 
             #region Constructor
+
             /// <summary>
-            /// Initializes a new instance of the <see cref="CultureInfoDelegateCommand"/> class. 
+            /// Initializes a new instance of the <see cref="CultureInfoDelegateCommand"/> class.
             /// Creates a new command that can always execute.
             /// </summary>
             /// <param name="execute">
             /// The execution logic.
             /// </param>
             public CultureInfoDelegateCommand(Action<CultureInfo> execute)
-                : this(execute, null)
-            {
+                : this(execute, null) {
             }
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="CultureInfoDelegateCommand"/> class. 
+            /// Initializes a new instance of the <see cref="CultureInfoDelegateCommand"/> class.
             /// Creates a new command.
             /// </summary>
             /// <param name="execute">
@@ -1159,30 +1085,27 @@ namespace WPFLocalizeExtension.Engine
             /// <param name="canExecute">
             /// The execution status logic.
             /// </param>
-            public CultureInfoDelegateCommand(Action<CultureInfo> execute, Predicate<CultureInfo> canExecute)
-            {
-                if (execute == null)
-                {
+            public CultureInfoDelegateCommand(Action<CultureInfo> execute, Predicate<CultureInfo> canExecute) {
+                if (execute == null) {
                     throw new ArgumentNullException("execute");
                 }
 
                 this.execute = execute;
                 this.canExecute = canExecute;
             }
-            #endregion
+
+            #endregion Constructor
 
             #region ICommand interface
+
             /// <summary>
-            /// Occurs when changes occur that affect whether or not the command should execute. 
+            /// Occurs when changes occur that affect whether or not the command should execute.
             /// </summary>
-            public event EventHandler CanExecuteChanged
-            {
-                add
-                {
+            public event EventHandler CanExecuteChanged {
+                add {
                     CommandManager.RequerySuggested += value;
                 }
-                remove
-                {
+                remove {
                     CommandManager.RequerySuggested -= value;
                 }
             }
@@ -1192,8 +1115,7 @@ namespace WPFLocalizeExtension.Engine
             /// </summary>
             /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
             /// <returns>true if this command can be executed; otherwise, false.</returns>
-            public bool CanExecute(object parameter)
-            {
+            public bool CanExecute(object parameter) {
                 return this.canExecute == null || this.canExecute((CultureInfo)parameter);
             }
 
@@ -1201,13 +1123,14 @@ namespace WPFLocalizeExtension.Engine
             /// Is called when the command is invoked.
             /// </summary>
             /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
-            public void Execute(object parameter)
-            {
+            public void Execute(object parameter) {
                 var c = new CultureInfo((string)parameter);
                 this.execute(c);
             }
-            #endregion
-        } 
-        #endregion
+
+            #endregion ICommand interface
+        }
+
+        #endregion CultureInfoDelegateCommand
     }
 }

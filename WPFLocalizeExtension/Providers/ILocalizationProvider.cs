@@ -1,25 +1,25 @@
 ﻿#region Copyright information
+
 // <copyright file="ILocalizationProvider.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Providers
-{
-    using System.Windows;
-    using System.Globalization;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Providers {
+
     using System;
-    using WPFLocalizeExtension.Engine;
+    using System.Collections.ObjectModel;
+    using System.Globalization;
+    using System.Windows;
 
     /// <summary>
     /// An interface describing classes that provide localized values based on a source/dictionary/key combination.
     /// </summary>
-    public interface ILocalizationProvider
-    {
+    public interface ILocalizationProvider {
+
         /// <summary>
         /// Uses the key and target to build a fully qualified resource key (Assembly, Dictionary, Key)
         /// </summary>
@@ -27,7 +27,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">Target used to help determine key information</param>
         /// <returns>Returns an object with all possible pieces of the given key (Assembly, Dictionary, Key)</returns>
         FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(String key, DependencyObject target);
-      
+
         /// <summary>
         /// Get the localized object.
         /// </summary>

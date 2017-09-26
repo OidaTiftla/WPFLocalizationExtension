@@ -1,26 +1,28 @@
 ﻿#region Copyright information
+
 // <copyright file="SafeTargetInfo.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Engine
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Engine {
+
     using System;
     using XAMLMarkupExtensions.Base;
-    
+
     /// <summary>
     /// An extension to the <see cref="XAMLMarkupExtensions.Base.TargetInfo"/> class with WeakReference instead of direct object linking.
     /// </summary>
-    public class SafeTargetInfo : TargetInfo
-    {
+    public class SafeTargetInfo : TargetInfo {
+
         /// <summary>
         /// Gets the target object reference.
         /// </summary>
         public WeakReference TargetObjectReference { get; private set; }
-        
+
         /// <summary>
         /// Creates a new TargetInfo instance.
         /// </summary>
@@ -29,8 +31,7 @@ namespace WPFLocalizeExtension.Engine
         /// <param name="targetPropertyType">The target property type.</param>
         /// <param name="targetPropertyIndex">The target property index.</param>
         public SafeTargetInfo(object targetObject, object targetProperty, Type targetPropertyType, int targetPropertyIndex)
-            : base(null, targetProperty, targetPropertyType, targetPropertyIndex)
-        {
+            : base(null, targetProperty, targetPropertyType, targetPropertyIndex) {
             this.TargetObjectReference = new WeakReference(targetObject);
         }
 
@@ -39,8 +40,7 @@ namespace WPFLocalizeExtension.Engine
         /// </summary>
         /// <param name="targetInfo">The target information.</param>
         /// <returns>A new instance with safe references.</returns>
-        public static SafeTargetInfo FromTargetInfo(TargetInfo targetInfo)
-        {
+        public static SafeTargetInfo FromTargetInfo(TargetInfo targetInfo) {
             return new SafeTargetInfo(targetInfo.TargetObject, targetInfo.TargetProperty, targetInfo.TargetPropertyType, targetInfo.TargetPropertyIndex);
         }
     }

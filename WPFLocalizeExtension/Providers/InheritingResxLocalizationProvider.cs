@@ -1,28 +1,33 @@
 ﻿#region Copyright information
+
 // <copyright file="InheritingResxLocalizationProvider.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Providers
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Providers {
+
     #region Uses
+
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Resources;
     using System.Windows;
     using XAMLMarkupExtensions.Base;
-    #endregion
+
+    #endregion Uses
 
     /// <summary>
     /// A singleton RESX provider that uses inheriting attached properties.
     /// </summary>
-    public class InheritingResxLocalizationProvider : ResxLocalizationProviderBase
-    {
+    public class InheritingResxLocalizationProvider : ResxLocalizationProviderBase {
+
         #region Dependency Properties
+
         /// <summary>
         /// <see cref="DependencyProperty"/> DefaultDictionary to set the fallback resource dictionary.
         /// </summary>
@@ -42,29 +47,32 @@ namespace WPFLocalizeExtension.Providers
                 typeof(string),
                 typeof(InheritingResxLocalizationProvider),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits, AttachedPropertyChanged));
-        #endregion
+
+        #endregion Dependency Properties
 
         #region Dependency Property Callback
+
         /// <summary>
         /// Indicates, that one of the attached properties changed.
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void AttachedPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void AttachedPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             Instance.OnProviderChanged(obj);
         }
-        #endregion
+
+        #endregion Dependency Property Callback
 
         #region Dependency Property Management
+
         #region Get
+
         /// <summary>
         /// Getter of <see cref="DependencyProperty"/> default dictionary.
         /// </summary>
         /// <param name="obj">The dependency object to get the default dictionary from.</param>
         /// <returns>The default dictionary.</returns>
-        public static string GetDefaultDictionary(DependencyObject obj)
-        {
+        public static string GetDefaultDictionary(DependencyObject obj) {
             return obj.GetValueSync<string>(DefaultDictionaryProperty);
         }
 
@@ -73,20 +81,20 @@ namespace WPFLocalizeExtension.Providers
         /// </summary>
         /// <param name="obj">The dependency object to get the default assembly from.</param>
         /// <returns>The default assembly.</returns>
-        public static string GetDefaultAssembly(DependencyObject obj)
-        {
+        public static string GetDefaultAssembly(DependencyObject obj) {
             return obj.GetValueSync<string>(DefaultAssemblyProperty);
         }
-        #endregion
+
+        #endregion Get
 
         #region Set
+
         /// <summary>
         /// Setter of <see cref="DependencyProperty"/> default dictionary.
         /// </summary>
         /// <param name="obj">The dependency object to set the default dictionary to.</param>
         /// <param name="value">The dictionary.</param>
-        public static void SetDefaultDictionary(DependencyObject obj, string value)
-        {
+        public static void SetDefaultDictionary(DependencyObject obj, string value) {
             obj.SetValueSync(DefaultDictionaryProperty, value);
         }
 
@@ -95,14 +103,16 @@ namespace WPFLocalizeExtension.Providers
         /// </summary>
         /// <param name="obj">The dependency object to set the default assembly to.</param>
         /// <param name="value">The assembly.</param>
-        public static void SetDefaultAssembly(DependencyObject obj, string value)
-        {
+        public static void SetDefaultAssembly(DependencyObject obj, string value) {
             obj.SetValueSync(DefaultAssemblyProperty, value);
         }
-        #endregion
-        #endregion
+
+        #endregion Set
+
+        #endregion Dependency Property Management
 
         #region Singleton Variables, Properties & Constructor
+
         /// <summary>
         /// The instance of the singleton.
         /// </summary>
@@ -116,14 +126,10 @@ namespace WPFLocalizeExtension.Providers
         /// <summary>
         /// Gets the <see cref="ResxLocalizationProvider"/> singleton.
         /// </summary>
-        public static InheritingResxLocalizationProvider Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (InstanceLock)
-                    {
+        public static InheritingResxLocalizationProvider Instance {
+            get {
+                if (instance == null) {
+                    lock (InstanceLock) {
                         if (instance == null)
                             instance = new InheritingResxLocalizationProvider();
                     }
@@ -137,26 +143,26 @@ namespace WPFLocalizeExtension.Providers
         /// <summary>
         /// The singleton constructor.
         /// </summary>
-        private InheritingResxLocalizationProvider()
-        {
+        private InheritingResxLocalizationProvider() {
             ResourceManagerList = new Dictionary<string, ResourceManager>();
             AvailableCultures = new ObservableCollection<CultureInfo>();
             AvailableCultures.Add(CultureInfo.InvariantCulture);
         }
-        #endregion
+
+        #endregion Singleton Variables, Properties & Constructor
 
         #region Abstract assembly & dictionary lookup
+
         /// <summary>
         /// Get the assembly from the context, if possible.
         /// </summary>
         /// <param name="target">The target object.</param>
         /// <returns>The assembly name, if available.</returns>
-        protected override string GetAssembly(DependencyObject target)
-        {
+        protected override string GetAssembly(DependencyObject target) {
             if (target == null)
                 return null;
 
-            return target.GetValue(InheritingResxLocalizationProvider.DefaultAssemblyProperty) as string; 
+            return target.GetValue(InheritingResxLocalizationProvider.DefaultAssemblyProperty) as string;
         }
 
         /// <summary>
@@ -164,13 +170,13 @@ namespace WPFLocalizeExtension.Providers
         /// </summary>
         /// <param name="target">The target object.</param>
         /// <returns>The dictionary name, if available.</returns>
-        protected override string GetDictionary(DependencyObject target)
-        {
+        protected override string GetDictionary(DependencyObject target) {
             if (target == null)
                 return null;
 
             return target.GetValue(InheritingResxLocalizationProvider.DefaultDictionaryProperty) as string;
         }
-        #endregion
+
+        #endregion Abstract assembly & dictionary lookup
     }
 }

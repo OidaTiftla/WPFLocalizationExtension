@@ -1,21 +1,23 @@
 ﻿#region Copyright information
+
 // <copyright file="ProviderEventArgs.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Providers
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Providers {
+
     using System;
     using System.Windows;
 
     /// <summary>
     /// Events arguments for a ProviderChangedEventHandler.
     /// </summary>
-    public class ProviderChangedEventArgs : EventArgs
-    {
+    public class ProviderChangedEventArgs : EventArgs {
+
         /// <summary>
         /// The target object.
         /// </summary>
@@ -25,8 +27,7 @@ namespace WPFLocalizeExtension.Providers
         /// Creates a new <see cref="ProviderChangedEventArgs"/> instance.
         /// </summary>
         /// <param name="obj">The target object.</param>
-        public ProviderChangedEventArgs(DependencyObject obj)
-        {
+        public ProviderChangedEventArgs(DependencyObject obj) {
             this.Object = obj;
         }
     }
@@ -41,8 +42,8 @@ namespace WPFLocalizeExtension.Providers
     /// <summary>
     /// Events arguments for a ProviderErrorEventHandler.
     /// </summary>
-    public class ProviderErrorEventArgs : EventArgs
-    {
+    public class ProviderErrorEventArgs : EventArgs {
+
         /// <summary>
         /// The target object.
         /// </summary>
@@ -64,8 +65,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="obj">The target object.</param>
         /// <param name="key">The key that caused the error.</param>
         /// <param name="message">The error message.</param>
-        public ProviderErrorEventArgs(DependencyObject obj, string key, string message)
-        {
+        public ProviderErrorEventArgs(DependencyObject obj, string key, string message) {
             this.Object = obj;
             this.Key = key;
             this.Message = message;
@@ -82,8 +82,8 @@ namespace WPFLocalizeExtension.Providers
     /// <summary>
     /// Events arguments for a ValueChangedEventHandler.
     /// </summary>
-    public class ValueChangedEventArgs : EventArgs
-    {
+    public class ValueChangedEventArgs : EventArgs {
+
         /// <summary>
         /// A custom tag.
         /// </summary>
@@ -105,8 +105,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="key">The key where the value was changed.</param>
         /// <param name="value">The new value.</param>
         /// <param name="tag">A custom tag.</param>
-        public ValueChangedEventArgs(string key, object value, object tag)
-        {
+        public ValueChangedEventArgs(string key, object value, object tag) {
             this.Key = key;
             this.Value = value;
             this.Tag = tag;

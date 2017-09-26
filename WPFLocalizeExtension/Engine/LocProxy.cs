@@ -1,14 +1,15 @@
 ﻿#region Copyright information
+
 // <copyright file="LocBinding.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Engine
-{
-    using System;
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Engine {
+
     using System.ComponentModel;
     using System.Windows;
     using WPFLocalizeExtension.Extensions;
@@ -16,14 +17,15 @@ namespace WPFLocalizeExtension.Engine
     /// <summary>
     /// A proxy class to localize object strings.
     /// </summary>
-    public class LocProxy : FrameworkElement
-    {
+    public class LocProxy : FrameworkElement {
+
         /// <summary>
         /// Our own <see cref="LocExtension"/> instance.
         /// </summary>
         private LocExtension ext = null;
 
         #region Source property
+
         /// <summary>
         /// The source.
         /// </summary>
@@ -33,14 +35,15 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.SourceProperty"/>
         /// </summary>
         [Category("Common")]
-        public object Source
-        {
+        public object Source {
             get { return (object)GetValue(SourceProperty); }
             set { SetValue(SourceProperty, value); }
         }
-        #endregion
+
+        #endregion Source property
 
         #region PrependType property
+
         /// <summary>
         /// This flag determines, if the type should be added using the given separator.
         /// </summary>
@@ -50,14 +53,15 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.PrependTypeProperty"/>
         /// </summary>
         [Category("Common")]
-        public bool PrependType
-        {
+        public bool PrependType {
             get { return (bool)GetValue(PrependTypeProperty); }
             set { SetValue(PrependTypeProperty, value); }
-        } 
-        #endregion
+        }
+
+        #endregion PrependType property
 
         #region Separator property
+
         /// <summary>
         /// The Separator.
         /// </summary>
@@ -67,14 +71,15 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.SeparatorProperty"/>
         /// </summary>
         [Category("Common")]
-        public string Separator
-        {
+        public string Separator {
             get { return (string)GetValue(SeparatorProperty); }
             set { SetValue(SeparatorProperty, value); }
         }
-        #endregion
+
+        #endregion Separator property
 
         #region Prefix property
+
         /// <summary>
         /// The Prefix.
         /// </summary>
@@ -84,14 +89,15 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.PrefixProperty"/>
         /// </summary>
         [Category("Common")]
-        public string Prefix
-        {
+        public string Prefix {
             get { return (string)GetValue(PrefixProperty); }
             set { SetValue(PrefixProperty, value); }
         }
-        #endregion
+
+        #endregion Prefix property
 
         #region Readonly result property
+
         /// <summary>
         /// The result.
         /// </summary>
@@ -101,26 +107,23 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.ResultProperty"/>
         /// </summary>
         [Category("Common")]
-        public string Result
-        {
+        public string Result {
             get { return (string)GetValue(ResultProperty.DependencyProperty) ?? this.Source.ToString(); }
             set { SetValue(ResultProperty, value); }
         }
-        #endregion
+
+        #endregion Readonly result property
 
         /// <summary>
         /// A notification handler for the <see cref="LocProxy.SourceProperty"/>.
         /// </summary>
         /// <param name="d">The object.</param>
         /// <param name="e">The event arguments.</param>
-        private static void PropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
+        private static void PropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var proxy = d as LocProxy;
-            if (proxy != null)
-            {
+            if (proxy != null) {
                 var source = proxy.Source;
-                if (source != null)
-                {
+                if (source != null) {
                     var key = source.ToString();
 
                     if (proxy.PrependType)
@@ -128,13 +131,11 @@ namespace WPFLocalizeExtension.Engine
                     if (!string.IsNullOrEmpty(proxy.Prefix))
                         key = proxy.Prefix + proxy.Separator + key;
 
-                    if (proxy.ext == null)
-                    {
+                    if (proxy.ext == null) {
                         proxy.ext = new LocExtension();
                         proxy.ext.Key = key;
                         proxy.ext.SetBinding(proxy, proxy.GetType().GetProperty("Result"));
-                    }
-                    else
+                    } else
                         proxy.ext.Key = key;
                 }
             }
@@ -143,8 +144,7 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// Creates a new enum localizer.
         /// </summary>
-        public LocProxy()
-        {
+        public LocProxy() {
         }
     }
 }

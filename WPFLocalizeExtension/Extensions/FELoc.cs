@@ -1,14 +1,17 @@
 ﻿#region Copyright information
+
 // <copyright file="FELoc.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Bernhard Millauer</author>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Extensions
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Extensions {
+
+    using Engine;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -18,16 +21,16 @@ namespace WPFLocalizeExtension.Extensions
     using System.Windows.Data;
     using System.Windows.Markup.Primitives;
     using System.Windows.Media.Imaging;
-    using Engine;
     using TypeConverters;
     using XAMLMarkupExtensions.Base;
-    
+
     /// <summary>
     /// A localization utility based on <see cref="FrameworkElement"/>.
     /// </summary>
-    public class FELoc : FrameworkElement, IDictionaryEventListener, INotifyPropertyChanged, IDisposable
-    {
+    public class FELoc : FrameworkElement, IDictionaryEventListener, INotifyPropertyChanged, IDisposable {
+
         #region PropertyChanged Logic
+
         /// <summary>
         /// Informiert über sich ändernde Eigenschaften.
         /// </summary>
@@ -39,29 +42,30 @@ namespace WPFLocalizeExtension.Extensions
         /// <param name="property">
         /// The property that changed
         /// </param>
-        internal void RaisePropertyChanged(string property)
-        {
+        internal void RaisePropertyChanged(string property) {
             if (this.PropertyChanged != null)
                 this.PropertyChanged(this, new PropertyChangedEventArgs(property));
         }
-        #endregion
+
+        #endregion PropertyChanged Logic
 
         #region Private variables
+
         private static object resourceBufferLock = new object();
         private static Dictionary<string, object> ResourceBuffer = new Dictionary<string, object>();
-        
+
         private ParentChangedNotifier parentChangedNotifier = null;
         private TargetInfo targetInfo = null;
-        #endregion
+
+        #endregion Private variables
 
         #region Resource buffer handling.
+
         /// <summary>
         /// Clears the common resource buffer.
         /// </summary>
-        public static void ClearResourceBuffer()
-        {
-            lock (resourceBufferLock)
-            {
+        public static void ClearResourceBuffer() {
+            lock (resourceBufferLock) {
                 if (ResourceBuffer != null)
                     ResourceBuffer.Clear();
             }
@@ -69,16 +73,13 @@ namespace WPFLocalizeExtension.Extensions
             ResourceBuffer = null;
         }
 
-
         /// <summary>
         /// Adds an item to the resource buffer (threadsafe).
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="item">The item.</param>
-        internal static void SafeAddItemToResourceBuffer(string key, object item)
-        {
-            lock (resourceBufferLock)
-            {
+        internal static void SafeAddItemToResourceBuffer(string key, object item) {
+            lock (resourceBufferLock) {
                 if (!LocalizeDictionary.Instance.DisableCache && !ResourceBuffer.ContainsKey(key))
                     ResourceBuffer.Add(key, item);
             }
@@ -88,17 +89,17 @@ namespace WPFLocalizeExtension.Extensions
         /// Removes an item from the resource buffer (threadsafe).
         /// </summary>
         /// <param name="key">The key.</param>
-        internal static void SafeRemoveItemFromResourceBuffer(string key)
-        {
-            lock (resourceBufferLock)
-            {
+        internal static void SafeRemoveItemFromResourceBuffer(string key) {
+            lock (resourceBufferLock) {
                 if (ResourceBuffer.ContainsKey(key))
                     ResourceBuffer.Remove(key);
             }
         }
-        #endregion
+
+        #endregion Resource buffer handling.
 
         #region DependencyProperty: Key
+
         /// <summary>
         /// <see cref="DependencyProperty"/> Key to set the resource key.
         /// </summary>
@@ -112,14 +113,15 @@ namespace WPFLocalizeExtension.Extensions
         /// <summary>
         /// The resource key.
         /// </summary>
-        public string Key
-        {
+        public string Key {
             get { return this.GetValueSync<string>(KeyProperty); }
             set { this.SetValueSync(KeyProperty, value); }
         }
-        #endregion
+
+        #endregion DependencyProperty: Key
 
         #region DependencyProperty: Converter
+
         /// <summary>
         /// <see cref="DependencyProperty"/> Converter to set the <see cref="IValueConverter"/> used to adapt to the target.
         /// </summary>
@@ -133,14 +135,15 @@ namespace WPFLocalizeExtension.Extensions
         /// <summary>
         /// Gets or sets the custom value converter.
         /// </summary>
-        public IValueConverter Converter
-        {
+        public IValueConverter Converter {
             get { return this.GetValueSync<IValueConverter>(ConverterProperty); }
             set { this.SetValueSync(ConverterProperty, value); }
-        } 
-        #endregion
+        }
+
+        #endregion DependencyProperty: Converter
 
         #region DependencyProperty: ConverterParameter
+
         /// <summary>
         /// <see cref="DependencyProperty"/> ConverterParameter.
         /// </summary>
@@ -154,14 +157,15 @@ namespace WPFLocalizeExtension.Extensions
         /// <summary>
         /// Gets or sets the converter parameter.
         /// </summary>
-        public object ConverterParameter
-        {
+        public object ConverterParameter {
             get { return this.GetValueSync<object>(ConverterParameterProperty); }
             set { this.SetValueSync(ConverterParameterProperty, value); }
         }
-        #endregion
+
+        #endregion DependencyProperty: ConverterParameter
 
         #region DependencyProperty: ForceCulture
+
         /// <summary>
         /// <see cref="DependencyProperty"/> ForceCulture.
         /// </summary>
@@ -175,14 +179,15 @@ namespace WPFLocalizeExtension.Extensions
         /// <summary>
         /// Gets or sets the forced culture.
         /// </summary>
-        public string ForceCulture
-        {
+        public string ForceCulture {
             get { return this.GetValueSync<string>(ForceCultureProperty); }
             set { this.SetValueSync(ForceCultureProperty, value); }
         }
-        #endregion
+
+        #endregion DependencyProperty: ForceCulture
 
         #region DependencyProperty: Content - used for value transfer only!
+
         ///// <summary>
         ///// <see cref="DependencyProperty"/> ForceCulture.
         ///// </summary>
@@ -202,23 +207,23 @@ namespace WPFLocalizeExtension.Extensions
         //}
 
         private object content;
+
         /// <summary>
         /// Gets or sets the content.
         /// </summary>
-        public object Content
-        {
+        public object Content {
             get { return content; }
             set { content = value; RaisePropertyChanged("Content"); }
         }
-        #endregion
+
+        #endregion DependencyProperty: Content - used for value transfer only!
 
         /// <summary>
         /// Indicates, that the key changed.
         /// </summary>
         /// <param name="obj">The FELoc object.</param>
         /// <param name="args">The event argument.</param>
-        private static void DependencyPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void DependencyPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             var loc = obj as FELoc;
 
             if (loc != null)
@@ -226,18 +231,16 @@ namespace WPFLocalizeExtension.Extensions
         }
 
         #region Parent changed event
-        private IList<DependencyProperty> GetAttachedProperties(DependencyObject obj)
-        {
+
+        private IList<DependencyProperty> GetAttachedProperties(DependencyObject obj) {
             List<DependencyProperty> attached = new List<DependencyProperty>();
 
             foreach (PropertyDescriptor pd in TypeDescriptor.GetProperties(obj,
-                new Attribute[] { new PropertyFilterAttribute(PropertyFilterOptions.All) }))
-            {
+                new Attribute[] { new PropertyFilterAttribute(PropertyFilterOptions.All) })) {
                 DependencyPropertyDescriptor dpd =
                     DependencyPropertyDescriptor.FromProperty(pd);
 
-                if (dpd != null && dpd.IsAttached)
-                {
+                if (dpd != null && dpd.IsAttached) {
                     attached.Add(dpd.DependencyProperty);
                 }
             }
@@ -250,8 +253,7 @@ namespace WPFLocalizeExtension.Extensions
         /// </summary>
         /// <param name="element">The target object.</param>
         /// <returns>The list of DependencyProperties of the object.</returns>
-        private List<DependencyProperty> GetDependencyProperties(Object element)
-        {
+        private List<DependencyProperty> GetDependencyProperties(Object element) {
             List<DependencyProperty> properties = new List<DependencyProperty>();
             MarkupObject markupObject = MarkupWriter.GetMarkupObjectFor(element);
 
@@ -263,20 +265,15 @@ namespace WPFLocalizeExtension.Extensions
             return properties;
         }
 
-        private void RegisterParentNotifier()
-        {
-            parentChangedNotifier = new ParentChangedNotifier(this, () =>
-            {
+        private void RegisterParentNotifier() {
+            parentChangedNotifier = new ParentChangedNotifier(this, () => {
                 parentChangedNotifier.Dispose();
                 parentChangedNotifier = null;
                 var targetObject = this.Parent;
-                if (targetObject != null)
-                {
+                if (targetObject != null) {
                     var properties = GetDependencyProperties(targetObject);
-                    foreach (var p in properties)
-                    {
-                        if (targetObject.GetValue(p) == this)
-                        {
+                    foreach (var p in properties) {
+                        if (targetObject.GetValue(p) == this) {
                             targetInfo = new TargetInfo(targetObject, p, p.PropertyType, -1);
 
                             Binding binding = new Binding("Content");
@@ -290,16 +287,17 @@ namespace WPFLocalizeExtension.Extensions
                     }
                 }
             });
-        } 
-        #endregion
+        }
+
+        #endregion Parent changed event
 
         #region Constructors & Dispose
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BLoc"/> class.
         /// </summary>
         public FELoc()
-            : base()
-        {
+            : base() {
             LocalizeDictionary.DictionaryEvent.AddListener(this);
             RegisterParentNotifier();
         }
@@ -309,29 +307,28 @@ namespace WPFLocalizeExtension.Extensions
         /// </summary>
         /// <param name="key">The resource identifier.</param>
         public FELoc(string key)
-            : this()
-        {
+            : this() {
             this.Key = key;
         }
 
         /// <summary>
         /// Removes the listener from the dictionary.
         /// </summary>
-        public void Dispose()
-        {
+        public void Dispose() {
             LocalizeDictionary.DictionaryEvent.RemoveListener(this);
         }
 
         /// <summary>
         /// The finalizer.
         /// </summary>
-        ~FELoc()
-        {
+        ~FELoc() {
             Dispose();
         }
-        #endregion
+
+        #endregion Constructors & Dispose
 
         #region Forced culture handling
+
         /// <summary>
         /// If Culture property defines a valid <see cref="CultureInfo"/>, a <see cref="CultureInfo"/> instance will get
         /// created and returned, otherwise <see cref="LocalizeDictionary"/>.Culture will get returned.
@@ -340,38 +337,28 @@ namespace WPFLocalizeExtension.Extensions
         /// <exception cref="System.ArgumentException">
         /// thrown if the parameter Culture don't defines a valid <see cref="CultureInfo"/>
         /// </exception>
-        protected CultureInfo GetForcedCultureOrDefault()
-        {
+        protected CultureInfo GetForcedCultureOrDefault() {
             // define a culture info
             CultureInfo cultureInfo;
 
             // check if the forced culture is not null or empty
-            if (!string.IsNullOrEmpty(this.ForceCulture))
-            {
+            if (!string.IsNullOrEmpty(this.ForceCulture)) {
                 // try to create a valid cultureinfo, if defined
-                try
-                {
+                try {
                     // try to create a specific culture from the forced one
                     // cultureInfo = CultureInfo.CreateSpecificCulture(this.ForceCulture);
                     cultureInfo = new CultureInfo(this.ForceCulture);
-                }
-                catch (ArgumentException ex)
-                {
+                } catch (ArgumentException ex) {
                     // on error, check if designmode is on
-                    if (LocalizeDictionary.Instance.GetIsInDesignMode())
-                    {
+                    if (LocalizeDictionary.Instance.GetIsInDesignMode()) {
                         // cultureInfo will be set to the current specific culture
                         cultureInfo = LocalizeDictionary.Instance.SpecificCulture;
-                    }
-                    else
-                    {
+                    } else {
                         // tell the customer, that the forced culture cannot be converted propperly
                         throw new ArgumentException("Cannot create a CultureInfo with '" + this.ForceCulture + "'", ex);
                     }
                 }
-            }
-            else
-            {
+            } else {
                 // take the current specific culture
                 cultureInfo = LocalizeDictionary.Instance.SpecificCulture;
             }
@@ -379,29 +366,28 @@ namespace WPFLocalizeExtension.Extensions
             // return the evaluated culture info
             return cultureInfo;
         }
-        #endregion
+
+        #endregion Forced culture handling
 
         /// <summary>
         /// This method is called when the resource somehow changed.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
-        public void ResourceChanged(DependencyObject sender, DictionaryEventArgs e)
-        {
+        public void ResourceChanged(DependencyObject sender, DictionaryEventArgs e) {
             UpdateNewValue();
         }
 
-        private void UpdateNewValue()
-        {
+        private void UpdateNewValue() {
             this.Content = FormatOutput();
         }
 
         #region Resource loopkup
+
         /// <summary>
         /// This function returns the properly prepared output of the markup extension.
         /// </summary>
-        public object FormatOutput()
-        {
+        public object FormatOutput() {
             object result = null;
 
             if (targetInfo == null)
@@ -449,54 +435,46 @@ namespace WPFLocalizeExtension.Extensions
             // Check, if the key is already in our resource buffer.
             object input = null;
 
-            if (!String.IsNullOrEmpty(resourceKey))
-            {
+            if (!String.IsNullOrEmpty(resourceKey)) {
                 // We've got a resource key. Try to look it up or get it from the dictionary.
                 if (ResourceBuffer.ContainsKey(resKeyBase + resourceKey))
                     result = ResourceBuffer[resKeyBase + resourceKey];
-                else
-                {
+                else {
                     input = LocalizeDictionary.Instance.GetLocalizedObject(resourceKey, targetObject, ci);
                     resKeyBase += resourceKey;
                 }
-            }
-            else
-            {
+            } else {
                 // Try the automatic lookup function.
                 // First, look for a resource entry named: [FrameworkElement name][Separator][Property name]
                 if (ResourceBuffer.ContainsKey(resKeyBase + resKeyNameProp))
                     result = ResourceBuffer[resKeyBase + resKeyNameProp];
-                else
-                {
+                else {
                     // It was not stored in the buffer - try to retrieve it from the dictionary.
                     input = LocalizeDictionary.Instance.GetLocalizedObject(resKeyNameProp, targetObject, ci);
 
-                    if (input == null)
-                    {
+                    if (input == null) {
                         // Now, try to look for a resource entry named: [FrameworkElement name]
                         // Note - this has to be nested here, as it would take precedence over the first step in the buffer lookup step.
                         if (ResourceBuffer.ContainsKey(resKeyBase + resKeyName))
                             result = ResourceBuffer[resKeyBase + resKeyName];
-                        else
-                        {
+                        else {
                             input = LocalizeDictionary.Instance.GetLocalizedObject(resKeyName, targetObject, ci);
                             resKeyBase += resKeyName;
                         }
-                    }
-                    else
+                    } else
                         resKeyBase += resKeyNameProp;
                 }
             }
 
             // If no result was found, convert the input and add it to the buffer.
-            if (result == null && input != null)
-            {
+            if (result == null && input != null) {
                 result = this.Converter.Convert(input, targetType, this.ConverterParameter, ci);
                 SafeAddItemToResourceBuffer(resKeyBase, result);
             }
 
             return result;
         }
-        #endregion
+
+        #endregion Resource loopkup
     }
 }

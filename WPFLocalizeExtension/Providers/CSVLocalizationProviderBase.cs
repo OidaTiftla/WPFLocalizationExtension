@@ -1,35 +1,34 @@
 #region Copyright information
+
 // <copyright file="CSVLocalizationProviderBase.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Sébastien Sevrin</author>
-#endregion
 
-namespace WPFLocalizeExtension.Providers
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Providers {
+
     #region Uses
+
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Windows;
-    using System.Resources;
-    using System.Reflection;
-    using System.Globalization;
-    using System.IO;
     using System.Collections.ObjectModel;
-    using System.Windows.Media;
-    using XAMLMarkupExtensions.Base;
-    using WPFLocalizeExtension.Engine;
-    #endregion
+    using System.Globalization;
+    using System.Reflection;
+    using System.Resources;
+    using System.Windows;
+
+    #endregion Uses
 
     /// <summary>
     /// The base for CSV file providers.
     /// </summary>
-    public abstract class CSVLocalizationProviderBase : DependencyObject, ILocalizationProvider
-    {
+    public abstract class CSVLocalizationProviderBase : DependencyObject, ILocalizationProvider {
+
         #region Variables
+
         /// <summary>
         /// Holds the name of the Resource Manager.
         /// </summary>
@@ -59,23 +58,22 @@ namespace WPFLocalizeExtension.Providers
         /// Lock object for concurrent access to the available culture list.
         /// </summary>
         protected object AvailableCultureListLock = new object();
-        #endregion
+
+        #endregion Variables
 
         #region Helper functions
+
         /// <summary>
         /// Returns the <see cref="AssemblyName"/> of the passed assembly instance
         /// </summary>
         /// <param name="assembly">The Assembly where to get the name from</param>
         /// <returns>The Assembly name</returns>
-        protected string GetAssemblyName(Assembly assembly)
-        {
-            if (assembly == null)
-            {
+        protected string GetAssemblyName(Assembly assembly) {
+            if (assembly == null) {
                 throw new ArgumentNullException("assembly");
             }
 
-            if (assembly.FullName == null)
-            {
+            if (assembly.FullName == null) {
                 throw new NullReferenceException("assembly.FullName is null");
             }
 
@@ -89,42 +87,39 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="outAssembly">The found or default assembly.</param>
         /// <param name="outDict">The found or default dictionary.</param>
         /// <param name="outKey">The found or default key.</param>
-        public static void ParseKey(string inKey, out string outAssembly, out string outDict, out string outKey)
-        {
+        public static void ParseKey(string inKey, out string outAssembly, out string outDict, out string outKey) {
             // Reset everything to null.
             outAssembly = null;
             outDict = null;
             outKey = null;
 
-            if (!string.IsNullOrEmpty(inKey))
-            {
+            if (!string.IsNullOrEmpty(inKey)) {
                 string[] split = inKey.Trim().Split(":".ToCharArray());
 
                 // assembly:dict:key
-                if (split.Length == 3)
-                {
+                if (split.Length == 3) {
                     outAssembly = !string.IsNullOrEmpty(split[0]) ? split[0] : null;
                     outDict = !string.IsNullOrEmpty(split[1]) ? split[1] : null;
                     outKey = split[2];
                 }
 
                 // dict:key
-                if (split.Length == 2)
-                {
+                if (split.Length == 2) {
                     outDict = !string.IsNullOrEmpty(split[0]) ? split[0] : null;
                     outKey = split[1];
                 }
 
                 // key
-                if (split.Length == 1)
-                {
+                if (split.Length == 1) {
                     outKey = split[0];
                 }
             }
         }
-        #endregion
+
+        #endregion Helper functions
 
         #region Abstract assembly & dictionary lookup
+
         /// <summary>
         /// Get the assembly from the context, if possible.
         /// </summary>
@@ -138,32 +133,33 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">The target object.</param>
         /// <returns>The dictionary name, if available.</returns>
         protected abstract string GetDictionary(DependencyObject target);
-        #endregion
+
+        #endregion Abstract assembly & dictionary lookup
 
         #region Culture Management
+
         /// <summary>
         /// Thread-safe access to the AvailableCultures list.
         /// </summary>
         /// <param name="c">The CultureInfo.</param>
-        protected void AddCulture(CultureInfo c)
-        {
-            lock (AvailableCultureListLock)
-            {
+        protected void AddCulture(CultureInfo c) {
+            lock (AvailableCultureListLock) {
                 if (!this.AvailableCultures.Contains(c))
                     this.AvailableCultures.Add(c);
             }
         }
-        #endregion
+
+        #endregion Culture Management
 
         #region ILocalizationProvider implementation
+
         /// <summary>
         /// Uses the key and target to build a fully qualified resource key (Assembly, Dictionary, Key)
         /// </summary>
         /// <param name="key">Key used as a base to find the full key</param>
         /// <param name="target">Target used to help determine key information</param>
         /// <returns>Returns an object with all possible pieces of the given key (Assembly, Dictionary, Key)</returns>
-        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(String key, DependencyObject target)
-        {
+        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(String key, DependencyObject target) {
             if (String.IsNullOrEmpty(key))
                 return null;
             String assembly, dictionary;
@@ -200,18 +196,14 @@ namespace WPFLocalizeExtension.Providers
         /// Calls the <see cref="ILocalizationProvider.ProviderChanged"/> event.
         /// </summary>
         /// <param name="target">The target object.</param>
-        protected virtual void OnProviderChanged(DependencyObject target)
-        {
-            try
-            {
+        protected virtual void OnProviderChanged(DependencyObject target) {
+            try {
                 var assembly = GetAssembly(target);
                 var dictionary = GetDictionary(target);
 
                 //if (!String.IsNullOrEmpty(assembly) && !String.IsNullOrEmpty(dictionary))
                 //    GetResourceManager(assembly, dictionary);
-            }
-            catch
-            {
+            } catch {
             }
 
             if (ProviderChanged != null)
@@ -224,8 +216,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">The target object.</param>
         /// <param name="key">The key.</param>
         /// <param name="message">The error message.</param>
-        protected virtual void OnProviderError(DependencyObject target, string key, string message)
-        {
+        protected virtual void OnProviderError(DependencyObject target, string key, string message) {
             if (ProviderError != null)
                 ProviderError(this, new ProviderErrorEventArgs(target, key, message));
         }
@@ -236,8 +227,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="key">The key where the value was changed.</param>
         /// <param name="value">The new value.</param>
         /// <param name="tag">A custom tag.</param>
-        protected virtual void OnValueChanged(string key, object value, object tag)
-        {
+        protected virtual void OnValueChanged(string key, object value, object tag) {
             if (ValueChanged != null)
                 ValueChanged(this, new ValueChangedEventArgs(key, value, tag));
         }
@@ -249,8 +239,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">The target object.</param>
         /// <param name="culture">The culture to use.</param>
         /// <returns>The value corresponding to the source/dictionary/key path for the given culture (otherwise NULL).</returns>
-        public virtual object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture)
-        {
+        public virtual object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture) {
             throw new InvalidOperationException("GetLocalizedObject needs to be overriden");
         }
 
@@ -258,6 +247,7 @@ namespace WPFLocalizeExtension.Providers
         /// An observable list of available cultures.
         /// </summary>
         public ObservableCollection<CultureInfo> AvailableCultures { get; protected set; }
-        #endregion
+
+        #endregion ILocalizationProvider implementation
     }
 }

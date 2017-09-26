@@ -1,28 +1,28 @@
 ﻿#region Copyright information
+
 // <copyright file="StandardLocConverter.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.TypeConverters
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.TypeConverters {
+
     using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Globalization;
     using System.Windows;
     using System.Windows.Data;
-    using System.Windows.Media;
-    using System.Globalization;
-    using System.ComponentModel;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Implements a standard converter that calls itself all known type converters.
     /// </summary>
-    public class DefaultConverter : IValueConverter
-    {
+    public class DefaultConverter : IValueConverter {
         private static Dictionary<Type, TypeConverter> TypeConverters = new Dictionary<Type, TypeConverter>();
-        
+
         /// <summary>
         /// Modifies the source data before passing it to the target for display in the UI.
         /// </summary>
@@ -31,8 +31,7 @@ namespace WPFLocalizeExtension.TypeConverters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="culture">The culture of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if (value == null)
                 return null;
 
@@ -47,8 +46,7 @@ namespace WPFLocalizeExtension.TypeConverters
             RegisterMissingTypeConverters.Register();
 
             // Is the type already known?
-            if (!TypeConverters.ContainsKey(targetType))
-            {
+            if (!TypeConverters.ContainsKey(targetType)) {
                 var c = TypeDescriptor.GetConverter(targetType);
 
                 if (targetType == typeof(Thickness))
@@ -66,12 +64,9 @@ namespace WPFLocalizeExtension.TypeConverters
                 return null;
 
             // Finally, try to convert the value.
-            try
-            {
+            try {
                 result = conv.ConvertFrom(value);
-            }
-            catch
-            {
+            } catch {
                 result = null;
             }
 
@@ -86,8 +81,7 @@ namespace WPFLocalizeExtension.TypeConverters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="culture">The culture of the conversion.</param>
         /// <returns>The value to be passed to the source object.</returns>
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             return Convert(value, targetType, parameter, culture);
         }
     }

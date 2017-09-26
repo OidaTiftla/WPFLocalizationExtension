@@ -1,36 +1,39 @@
 ﻿#region Copyright information
+
 // <copyright file="ObjectDependencyManager.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Bernhard Millauer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Engine
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Engine {
+
     #region Uses
+
     using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
-    #endregion
+
+    #endregion Uses
 
     /// <summary>
     /// This class ensures, that a specific object lives as long a associated object is alive.
     /// </summary>
-    public static class ObjectDependencyManager
-    {
+    public static class ObjectDependencyManager {
+
         /// <summary>
         /// This member holds the list of all <see cref="WeakReference"/>s and their appropriate objects.
         /// </summary>
         private static Dictionary<object, List<WeakReference>> internalList;
 
         /// <summary>
-        /// Initializes static members of the <see cref="ObjectDependencyManager"/> class. 
-        /// Static Constructor. Creates a new instance of 
+        /// Initializes static members of the <see cref="ObjectDependencyManager"/> class.
+        /// Static Constructor. Creates a new instance of
         /// Dictionary(object, <see cref="WeakReference"/>) and set it to the <see cref="internalList"/>.
         /// </summary>
-        static ObjectDependencyManager()
-        {
+        static ObjectDependencyManager() {
             internalList = new Dictionary<object, List<WeakReference>>();
         }
 
@@ -52,26 +55,22 @@ namespace WPFLocalizeExtension.Engine
         /// The <see cref="WeakReference"/>.Target cannot be the same as <paramref name="objToHold"/>
         /// </exception>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static bool AddObjectDependency(WeakReference weakRefDp, object objToHold)
-        {
+        public static bool AddObjectDependency(WeakReference weakRefDp, object objToHold) {
             // run the clean up to ensure that only objects are watched they are realy still alive
             CleanUp();
 
             // if the objToHold is null, we cannot handle this afterwards.
-            if (objToHold == null)
-            {
+            if (objToHold == null) {
                 throw new ArgumentNullException("objToHold", "The objToHold cannot be null");
             }
 
             // if the objToHold is a weakreference, we cannot handle this type afterwards.
-            if (objToHold.GetType() == typeof(WeakReference))
-            {
+            if (objToHold.GetType() == typeof(WeakReference)) {
                 throw new ArgumentException("objToHold cannot be type of WeakReference", "objToHold");
             }
 
             // if the target of the weakreference is the objToHold, this would be a cycling play.
-            if (weakRefDp.Target == objToHold)
-            {
+            if (weakRefDp.Target == objToHold) {
                 throw new InvalidOperationException("The WeakReference.Target cannot be the same as objToHold");
             }
 
@@ -79,21 +78,17 @@ namespace WPFLocalizeExtension.Engine
             bool itemRegistered = false;
 
             // check if the objToHold is contained in the internalList.
-            if (!internalList.ContainsKey(objToHold))
-            {
+            if (!internalList.ContainsKey(objToHold)) {
                 // add the objToHold to the internal list.
                 List<WeakReference> lst = new List<WeakReference> { weakRefDp };
 
                 internalList.Add(objToHold, lst);
 
                 itemRegistered = true;
-            }
-            else
-            {
+            } else {
                 // otherweise, check if the weakRefDp exists and add it if necessary
                 List<WeakReference> lst = internalList[objToHold];
-                if (!lst.Contains(weakRefDp))
-                {
+                if (!lst.Contains(weakRefDp)) {
                     lst.Add(weakRefDp);
 
                     itemRegistered = true;
@@ -107,8 +102,7 @@ namespace WPFLocalizeExtension.Engine
         /// <summary>
         /// This method cleans up all independent (!<see cref="WeakReference"/>.IsAlive) objects.
         /// </summary>
-        public static void CleanUp()
-        {
+        public static void CleanUp() {
             // call the overloaded method
             CleanUp(null);
         }
@@ -120,14 +114,11 @@ namespace WPFLocalizeExtension.Engine
         /// If defined, the associated object dependency will be removed instead of a full CleanUp
         /// </param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static void CleanUp(object objToRemove)
-        {
+        public static void CleanUp(object objToRemove) {
             // if a particular object is passed, remove it.
-            if (objToRemove != null)
-            {
+            if (objToRemove != null) {
                 // if the key wasnt found, throw an exception.
-                if (!internalList.Remove(objToRemove))
-                {
+                if (!internalList.Remove(objToRemove)) {
                     throw new Exception("Key was not found!");
                 }
 
@@ -141,29 +132,24 @@ namespace WPFLocalizeExtension.Engine
             List<object> keysToRemove = new List<object>();
 
             // step through all object dependenies
-            foreach (KeyValuePair<object, List<WeakReference>> kvp in internalList)
-            {
+            foreach (KeyValuePair<object, List<WeakReference>> kvp in internalList) {
                 // step recursive through all weak references
-                for (int i = kvp.Value.Count - 1; i >= 0; i--)
-                {
+                for (int i = kvp.Value.Count - 1; i >= 0; i--) {
                     // if this weak reference is no more alive, remove it
-					var targetReference = kvp.Value[i].Target;
-                    if (targetReference == null)
-                    {
+                    var targetReference = kvp.Value[i].Target;
+                    if (targetReference == null) {
                         kvp.Value.RemoveAt(i);
                     }
                 }
 
                 // if the list of weak references is empty, temove the whole entry
-                if (kvp.Value.Count == 0)
-                {
+                if (kvp.Value.Count == 0) {
                     keysToRemove.Add(kvp.Key);
                 }
             }
 
             // step recursive through all keys that have to be remove
-            for (int i = keysToRemove.Count - 1; i >= 0; i--)
-            {
+            for (int i = keysToRemove.Count - 1; i >= 0; i--) {
                 // remove the key from the internalList
                 internalList.Remove(keysToRemove[i]);
             }

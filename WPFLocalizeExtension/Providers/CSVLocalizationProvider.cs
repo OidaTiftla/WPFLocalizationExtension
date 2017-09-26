@@ -1,31 +1,35 @@
 #region Copyright information
+
 // <copyright file="CSVLocalizationProvider.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Sébastien Sevrin</author>
-#endregion
 
-namespace WPFLocalizeExtension.Providers
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Providers {
+
     #region Uses
+
+    using Engine;
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.IO;
     using System.Text;
     using System.Windows;
-    using Engine;
     using XAMLMarkupExtensions.Base;
-    #endregion
+
+    #endregion Uses
 
     /// <summary>
     /// A singleton CSV provider that uses attached properties and the Parent property to iterate through the visual tree.
     /// </summary>
-    public class CSVLocalizationProvider : CSVLocalizationProviderBase
-    {
+    public class CSVLocalizationProvider : CSVLocalizationProviderBase {
+
         #region Dependency Properties
+
         /// <summary>
         /// <see cref="DependencyProperty"/> DefaultDictionary to set the fallback resource dictionary.
         /// </summary>
@@ -35,16 +39,17 @@ namespace WPFLocalizeExtension.Providers
                 typeof(string),
                 typeof(CSVLocalizationProvider),
                 new PropertyMetadata(null, AttachedPropertyChanged));
-        #endregion
+
+        #endregion Dependency Properties
 
         #region Dependency Property Callback
+
         /// <summary>
         /// Indicates, that one of the attached properties changed.
         /// </summary>
         /// <param name="obj">The dependency object.</param>
         /// <param name="args">The event argument.</param>
-        private static void AttachedPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
+        private static void AttachedPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args) {
             UpdateAvailableCultures(obj);
             Instance.OnProviderChanged(obj);
         }
@@ -53,8 +58,7 @@ namespace WPFLocalizeExtension.Providers
         /// Searches for all available cultures and adds them to the list.
         /// </summary>
         /// <param name="target"></param>
-        private static void UpdateAvailableCultures(DependencyObject target)
-        {
+        private static void UpdateAvailableCultures(DependencyObject target) {
             var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
 
             var csvDirectory = "Localization";
@@ -69,48 +73,55 @@ namespace WPFLocalizeExtension.Providers
 
             // add culture invariant
             csvPath = Path.Combine(csvDirectory, dictionary + ".csv");
-            if (File.Exists(csvPath))
-            {
+            if (File.Exists(csvPath)) {
                 Instance.AddCulture(CultureInfo.InvariantCulture);
                 Instance.AddCulture(CultureInfo.GetCultureInfo("en"));
             }
         }
-        #endregion
+
+        #endregion Dependency Property Callback
 
         #region Dependency Property Management
+
         #region Get
+
         /// <summary>
         /// Getter of <see cref="DependencyProperty"/> default dictionary.
         /// </summary>
         /// <param name="obj">The dependency object to get the default dictionary from.</param>
         /// <returns>The default dictionary.</returns>
-        public static string GetDefaultDictionary(DependencyObject obj)
-        {
+        public static string GetDefaultDictionary(DependencyObject obj) {
             return obj.GetValueSync<string>(DefaultDictionaryProperty);
         }
-        #endregion
+
+        #endregion Get
 
         #region Set
+
         /// <summary>
         /// Setter of <see cref="DependencyProperty"/> default dictionary.
         /// </summary>
         /// <param name="obj">The dependency object to set the default dictionary to.</param>
         /// <param name="value">The dictionary.</param>
-        public static void SetDefaultDictionary(DependencyObject obj, string value)
-        {
+        public static void SetDefaultDictionary(DependencyObject obj, string value) {
             obj.SetValueSync(DefaultDictionaryProperty, value);
         }
-        #endregion
-        #endregion
+
+        #endregion Set
+
+        #endregion Dependency Property Management
 
         #region Variables
+
         /// <summary>
         /// A dictionary for notification classes for changes of the individual target Parent changes.
         /// </summary>
         private ParentNotifiers parentNotifiers = new ParentNotifiers();
-        #endregion
+
+        #endregion Variables
 
         #region Singleton Variables, Properties & Constructor
+
         /// <summary>
         /// The instance of the singleton.
         /// </summary>
@@ -124,14 +135,10 @@ namespace WPFLocalizeExtension.Providers
         /// <summary>
         /// Gets the <see cref="CSVLocalizationProvider"/> singleton.
         /// </summary>
-        public static CSVLocalizationProvider Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (InstanceLock)
-                    {
+        public static CSVLocalizationProvider Instance {
+            get {
+                if (instance == null) {
+                    lock (InstanceLock) {
                         if (instance == null)
                             instance = new CSVLocalizationProvider();
                     }
@@ -145,34 +152,33 @@ namespace WPFLocalizeExtension.Providers
         /// <summary>
         /// The singleton constructor.
         /// </summary>
-        private CSVLocalizationProvider()
-        {
+        private CSVLocalizationProvider() {
             AvailableCultures = new ObservableCollection<CultureInfo>();
             AvailableCultures.Add(CultureInfo.InvariantCulture);
         }
 
         private bool hasHeader = false;
+
         /// <summary>
         /// A flag indicating, if it has a header row.
         /// </summary>
-        public bool HasHeader
-        {
+        public bool HasHeader {
             get { return hasHeader; }
-            set
-            {
+            set {
                 hasHeader = value;
-                //OnProviderChanged(null); 
+                //OnProviderChanged(null);
             }
         }
-        #endregion
+
+        #endregion Singleton Variables, Properties & Constructor
 
         #region Abstract dictionary lookup
+
         /// <summary>
         /// An action that will be called when a parent of one of the observed target objects changed.
         /// </summary>
         /// <param name="obj">The target <see cref="DependencyObject"/>.</param>
-        private void ParentChangedAction(DependencyObject obj)
-        {
+        private void ParentChangedAction(DependencyObject obj) {
             OnProviderChanged(obj);
         }
 
@@ -181,8 +187,7 @@ namespace WPFLocalizeExtension.Providers
         /// </summary>
         /// <param name="target">The target object.</param>
         /// <returns>The dictionary name, if available.</returns>
-        protected override string GetDictionary(DependencyObject target)
-        {
+        protected override string GetDictionary(DependencyObject target) {
             if (target == null)
                 return null;
 
@@ -194,8 +199,7 @@ namespace WPFLocalizeExtension.Providers
         /// </summary>
         /// <param name="target">The target object.</param>
         /// <returns>The assembly name, if available.</returns>
-        protected override string GetAssembly(DependencyObject target)
-        {
+        protected override string GetAssembly(DependencyObject target) {
             if (target == null)
                 return null;
 
@@ -209,8 +213,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">The target object.</param>
         /// <param name="culture">The culture to use.</param>
         /// <returns>The value corresponding to the source/dictionary/key path for the given culture (otherwise NULL).</returns>
-        public override object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture)
-        {
+        public override object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture) {
             string ret = null;
 
             string filename = "";
@@ -229,8 +232,7 @@ namespace WPFLocalizeExtension.Providers
             var csvDirectory = "Localization";
             var csvPath = "";
 
-            while (culture != CultureInfo.InvariantCulture)
-            {
+            while (culture != CultureInfo.InvariantCulture) {
                 csvPath = Path.Combine(csvDirectory, dictionary + (String.IsNullOrEmpty(culture.Name) ? "" : "." + culture.Name) + ".csv");
 
                 if (File.Exists(csvPath))
@@ -239,28 +241,24 @@ namespace WPFLocalizeExtension.Providers
                 culture = culture.Parent;
             }
 
-            if (!File.Exists(csvPath))
-            {
+            if (!File.Exists(csvPath)) {
                 // Take the invariant culture.
                 csvPath = Path.Combine(csvDirectory, dictionary + ".csv");
 
-                if (!File.Exists(csvPath))
-                {
+                if (!File.Exists(csvPath)) {
                     OnProviderError(target, key, "A file for the provided culture " + culture.EnglishName + " does not exist at " + csvPath + ".");
                     return null;
                 }
             }
 
             // Open the file.
-            using (var reader = new StreamReader(csvPath, Encoding.Default))
-            {
+            using (var reader = new StreamReader(csvPath, Encoding.Default)) {
                 // Skip the header if needed.
                 if (this.HasHeader && !reader.EndOfStream)
                     reader.ReadLine();
 
                 // Read each line and split it.
-                while (!reader.EndOfStream)
-                {
+                while (!reader.EndOfStream) {
                     var line = reader.ReadLine();
                     var parts = line.Split(";".ToCharArray());
 
@@ -283,6 +281,7 @@ namespace WPFLocalizeExtension.Providers
 
             return ret;
         }
-        #endregion
+
+        #endregion Abstract dictionary lookup
     }
 }

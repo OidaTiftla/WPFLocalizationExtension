@@ -1,15 +1,18 @@
 ﻿#region Copyright information
+
 // <copyright file="ResxLocalizationProviderBase.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
 // <author>Bernhard Millauer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Providers
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Providers {
+
     #region Uses
+
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -17,18 +20,20 @@ namespace WPFLocalizeExtension.Providers
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Management;
     using System.Reflection;
     using System.Resources;
     using System.Windows;
-    using System.Management;
-    #endregion
+
+    #endregion Uses
 
     /// <summary>
     /// The base for RESX file providers.
     /// </summary>
-    public abstract class ResxLocalizationProviderBase : DependencyObject, ILocalizationProvider
-    {
+    public abstract class ResxLocalizationProviderBase : DependencyObject, ILocalizationProvider {
+
         #region Variables
+
         /// <summary>
         /// Holds the name of the Resource Manager.
         /// </summary>
@@ -60,31 +65,30 @@ namespace WPFLocalizeExtension.Providers
         protected object AvailableCultureListLock = new object();
 
         private bool ignoreCase = true;
+
         /// <summary>
         /// Gets or sets the ignore case flag.
         /// </summary>
-        public bool IgnoreCase
-        {
+        public bool IgnoreCase {
             get { return ignoreCase; }
             set { ignoreCase = value; }
         }
-        #endregion
+
+        #endregion Variables
 
         #region Helper functions
+
         /// <summary>
         /// Returns the <see cref="AssemblyName"/> of the passed assembly instance
         /// </summary>
         /// <param name="assembly">The Assembly where to get the name from</param>
         /// <returns>The Assembly name</returns>
-        protected string GetAssemblyName(Assembly assembly)
-        {
-            if (assembly == null)
-            {
+        protected string GetAssemblyName(Assembly assembly) {
+            if (assembly == null) {
                 throw new ArgumentNullException("assembly");
             }
 
-            if (assembly.FullName == null)
-            {
+            if (assembly.FullName == null) {
                 throw new NullReferenceException("assembly.FullName is null");
             }
 
@@ -98,42 +102,39 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="outAssembly">The found or default assembly.</param>
         /// <param name="outDict">The found or default dictionary.</param>
         /// <param name="outKey">The found or default key.</param>
-        public static void ParseKey(string inKey, out string outAssembly, out string outDict, out string outKey)
-        {
+        public static void ParseKey(string inKey, out string outAssembly, out string outDict, out string outKey) {
             // Reset everything to null.
             outAssembly = null;
             outDict = null;
             outKey = null;
 
-            if (!string.IsNullOrEmpty(inKey))
-            {
+            if (!string.IsNullOrEmpty(inKey)) {
                 string[] split = inKey.Trim().Split(":".ToCharArray());
 
                 // assembly:dict:key
-                if (split.Length == 3)
-                {
+                if (split.Length == 3) {
                     outAssembly = !string.IsNullOrEmpty(split[0]) ? split[0] : null;
                     outDict = !string.IsNullOrEmpty(split[1]) ? split[1] : null;
                     outKey = split[2];
                 }
 
                 // dict:key
-                if (split.Length == 2)
-                {
+                if (split.Length == 2) {
                     outDict = !string.IsNullOrEmpty(split[0]) ? split[0] : null;
                     outKey = split[1];
                 }
 
                 // key
-                if (split.Length == 1)
-                {
+                if (split.Length == 1) {
                     outKey = split[0];
                 }
             }
         }
-        #endregion
+
+        #endregion Helper functions
 
         #region Abstract assembly & dictionary lookup
+
         /// <summary>
         /// Get the assembly from the context, if possible.
         /// </summary>
@@ -147,17 +148,18 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">The target object.</param>
         /// <returns>The dictionary name, if available.</returns>
         protected abstract string GetDictionary(DependencyObject target);
-        #endregion
+
+        #endregion Abstract assembly & dictionary lookup
 
         #region ResourceManager management
+
         /// <summary>
         /// Thread-safe access to the resource manager dictionary.
         /// </summary>
         /// <param name="thekey">Key.</param>
         /// <param name="result">Value.</param>
         /// <returns>Success of the operation.</returns>
-        protected bool TryGetValue(string thekey, out ResourceManager result)
-        {
+        protected bool TryGetValue(string thekey, out ResourceManager result) {
             lock (ResourceManagerListLock) { return this.ResourceManagerList.TryGetValue(thekey, out result); }
         }
 
@@ -166,8 +168,7 @@ namespace WPFLocalizeExtension.Providers
         /// </summary>
         /// <param name="thekey">Key.</param>
         /// <param name="value">Value.</param>
-        protected void Add(string thekey, ResourceManager value)
-        {
+        protected void Add(string thekey, ResourceManager value) {
             lock (ResourceManagerListLock) { this.ResourceManagerList.Add(thekey, value); }
         }
 
@@ -175,16 +176,14 @@ namespace WPFLocalizeExtension.Providers
         /// Tries to remove a key from the resource manager dictionary.
         /// </summary>
         /// <param name="thekey">Key.</param>
-        protected void TryRemove(string thekey)
-        {
+        protected void TryRemove(string thekey) {
             lock (ResourceManagerListLock) { if (this.ResourceManagerList.ContainsKey(thekey)) this.ResourceManagerList.Remove(thekey); }
         }
 
         /// <summary>
         /// Clears the whole list of cached resource managers.
         /// </summary>
-        public void ClearResourceManagerList()
-        {
+        public void ClearResourceManagerList() {
             lock (ResourceManagerListLock) { this.ResourceManagerList.Clear(); }
         }
 
@@ -192,10 +191,8 @@ namespace WPFLocalizeExtension.Providers
         /// Thread-safe access to the AvailableCultures list.
         /// </summary>
         /// <param name="c">The CultureInfo.</param>
-        protected void AddCulture(CultureInfo c)
-        {
-            lock (AvailableCultureListLock)
-            {
+        protected void AddCulture(CultureInfo c) {
+            lock (AvailableCultureListLock) {
                 if (!this.AvailableCultures.Contains(c))
                     this.AvailableCultures.Add(c);
             }
@@ -207,8 +204,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="resourceAssembly">The resource assembly.</param>
         /// <param name="resourceDictionary">The dictionary to look up.</param>
         /// <returns>True, if the update was successful.</returns>
-        public bool UpdateCultureList(string resourceAssembly, string resourceDictionary)
-        {
+        public bool UpdateCultureList(string resourceAssembly, string resourceDictionary) {
             return GetResourceManager(resourceAssembly, resourceDictionary) != null;
         }
 
@@ -223,27 +219,23 @@ namespace WPFLocalizeExtension.Providers
         /// </summary>
         /// <param name="processId">The process id.</param>
         /// <returns>The path if found; otherwise, null.</returns>
-        private static string GetExecutablePath(int processId)
-        {
+        private static string GetExecutablePath(int processId) {
             if (executablePaths.ContainsKey(processId))
                 return executablePaths[processId];
 
             const string wmiQueryString = "SELECT ProcessId, ExecutablePath, CommandLine FROM Win32_Process";
             using (var searcher = new ManagementObjectSearcher(wmiQueryString))
-            using (var results = searcher.Get())
-            {
+            using (var results = searcher.Get()) {
                 var query = from p in Process.GetProcesses()
                             join mo in results.Cast<ManagementObject>()
                             on p.Id equals (int)(uint)mo["ProcessId"]
                             where p.Id == processId
-                            select new
-                            {
+                            select new {
                                 Process = p,
                                 Path = (string)mo["ExecutablePath"],
                                 CommandLine = (string)mo["CommandLine"],
                             };
-                foreach (var item in query)
-                {
+                foreach (var item in query) {
                     executablePaths.Add(processId, item.Path);
                     return item.Path;
                 }
@@ -252,8 +244,7 @@ namespace WPFLocalizeExtension.Providers
             return null;
         }
 
-        private static bool IsFileOfInterest(string f, string dir)
-        {
+        private static bool IsFileOfInterest(string f, string dir) {
             if (String.IsNullOrEmpty(f))
                 return false;
 
@@ -279,8 +270,7 @@ namespace WPFLocalizeExtension.Providers
         /// <exception cref="System.ArgumentException">
         /// If the searched <see cref="ResourceManager"/> wasn't found
         /// </exception>
-        protected ResourceManager GetResourceManager(string resourceAssembly, string resourceDictionary)
-        {
+        protected ResourceManager GetResourceManager(string resourceAssembly, string resourceDictionary) {
             Assembly assembly = null;
             ResourceManager resManager;
             string foundResource = null;
@@ -291,9 +281,8 @@ namespace WPFLocalizeExtension.Providers
             // Here comes our great hack for full VS2012+ design time support with multiple languages.
             // We check only every second to reduce overhead in the designer.
             var now = DateTime.Now;
-            
-            if (AppDomain.CurrentDomain.FriendlyName.Contains("XDesProc") && ((now - lastUpdateCheck).TotalSeconds >= 1.0))
-            {
+
+            if (AppDomain.CurrentDomain.FriendlyName.Contains("XDesProc") && ((now - lastUpdateCheck).TotalSeconds >= 1.0)) {
                 // This block is only handled during design time.
                 lastUpdateCheck = now;
 
@@ -302,10 +291,8 @@ namespace WPFLocalizeExtension.Providers
                 var assemblyDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
 
                 // If not done yet, find the VS process that shows our design.
-                if (string.IsNullOrEmpty(projectDirectory))
-                {
-                    foreach (var process in Process.GetProcesses())
-                    {
+                if (string.IsNullOrEmpty(projectDirectory)) {
+                    foreach (var process in Process.GetProcesses()) {
                         if (!process.ProcessName.Contains(".vshost"))
                             continue;
 
@@ -318,8 +305,7 @@ namespace WPFLocalizeExtension.Providers
                         // Get all files.
                         var files = Directory.GetFiles(projectDirectory, "*.*", SearchOption.AllDirectories);
 
-                        if (files.Where(f => Path.GetFileName(f).StartsWith(resourceAssembly)).Count() > 0)
-                        {
+                        if (files.Where(f => Path.GetFileName(f).StartsWith(resourceAssembly)).Count() > 0) {
                             // We got a hit. Filter the files that are of interest for this provider.
                             projectFilesCache = files.Where(f => IsFileOfInterest(f, projectDirectory)).ToArray();
 
@@ -327,21 +313,16 @@ namespace WPFLocalizeExtension.Providers
                             break;
                         }
                     }
-                }
-                else
-                {
+                } else {
                     // Remove the resource manager from the dictionary.
                     TryRemove(resManKey);
 
                     // Copy all newer or missing files.
-                    foreach (var f in projectFilesCache)
-                    {
-                        try
-                        {
+                    foreach (var f in projectFilesCache) {
+                        try {
                             var dst = Path.Combine(assemblyDir, f.Replace(projectDirectory + "\\", ""));
 
-                            if (!File.Exists(dst) || (Directory.GetLastWriteTime(dst) < Directory.GetLastWriteTime(f)))
-                            {
+                            if (!File.Exists(dst) || (Directory.GetLastWriteTime(dst) < Directory.GetLastWriteTime(f))) {
                                 var dstDir = Path.GetDirectoryName(dst);
                                 if (String.IsNullOrEmpty(dstDir))
                                     continue;
@@ -364,23 +345,18 @@ namespace WPFLocalizeExtension.Providers
                 }
             }
 
-            if (!TryGetValue(resManKey, out resManager))
-            {
+            if (!TryGetValue(resManKey, out resManager)) {
                 // If the assembly cannot be loaded, throw an exception
-                if (assembly == null)
-                {
-                    try
-                    {
+                if (assembly == null) {
+                    try {
                         // go through every assembly loaded in the app domain
                         var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-                        foreach (var assemblyInAppDomain in loadedAssemblies)
-                        {
+                        foreach (var assemblyInAppDomain in loadedAssemblies) {
                             // get the assembly name object
                             AssemblyName assemblyName = new AssemblyName(assemblyInAppDomain.FullName);
 
                             // check if the name of the assembly is the seached one
-                            if (assemblyName.Name == resourceAssembly)
-                            {
+                            if (assemblyName.Name == resourceAssembly) {
                                 // assigne the assembly
                                 assembly = assemblyInAppDomain;
 
@@ -390,14 +366,11 @@ namespace WPFLocalizeExtension.Providers
                         }
 
                         // check if the assembly is still null
-                        if (assembly == null)
-                        {
+                        if (assembly == null) {
                             // assign the loaded assembly
                             assembly = Assembly.Load(new AssemblyName(resourceAssembly));
                         }
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         throw new Exception(string.Format("The Assembly '{0}' cannot be loaded.", resourceAssembly), ex);
                     }
                 }
@@ -407,34 +380,25 @@ namespace WPFLocalizeExtension.Providers
 
                 // get all available types (and ignore unloadable types, e.g. because of unsatisfied dependencies)
                 IEnumerable<Type> availableTypes;
-                try
-                {
+                try {
                     availableTypes = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException e)
-                {
+                } catch (ReflectionTypeLoadException e) {
                     availableTypes = e.Types.Where(t => t != null);
                 }
 
                 // The proposed approach of Andras (http://wpflocalizeextension.codeplex.com/discussions/66098?ProjectName=wpflocalizeextension)
-                Func<Type, string> tryGetNamespace = delegate(Type type)
-                {
+                Func<Type, string> tryGetNamespace = delegate (Type type) {
                     // Ignore unloadable types
-                    try
-                    {
+                    try {
                         return type.Namespace;
-                    }
-                    catch (Exception)
-                    {
+                    } catch (Exception) {
                         return null;
                     }
                 };
                 var possiblePrefixes = availableTypes.Select(tryGetNamespace).Where(n => n != null).Distinct().ToList();
 
-                foreach (string availableResource in availableResources)
-                {
-                    if (availableResource.EndsWith(resManagerNameToSearch) && possiblePrefixes.Any(p => availableResource.StartsWith(p + ".")))
-                    {
+                foreach (string availableResource in availableResources) {
+                    if (availableResource.EndsWith(resManagerNameToSearch) && possiblePrefixes.Any(p => availableResource.StartsWith(p + "."))) {
                         // take the first occurrence and break
                         foundResource = availableResource;
                         break;
@@ -442,36 +406,27 @@ namespace WPFLocalizeExtension.Providers
                 }
 
                 // NOTE: Inverted this IF (nesting is bad, I know) so we just create a new ResourceManager.  -gen3ric
-                if (foundResource != null)
-                {
+                if (foundResource != null) {
                     // remove ".resources" from the end
                     foundResource = foundResource.Substring(0, foundResource.Length - ResourceFileExtension.Length);
 
                     // First try the simple retrieval
                     Type resourceManagerType;
-                    try
-                    {
+                    try {
                         resourceManagerType = assembly.GetType(foundResource);
-                    }
-                    catch (Exception)
-                    {
+                    } catch (Exception) {
                         resourceManagerType = null;
                     }
 
                     // If simple doesn't work, check all of the types without using dot notation
-                    if (resourceManagerType == null)
-                    {
+                    if (resourceManagerType == null) {
                         var dictTypeName = resourceDictionary.Replace('.', '_');
 
-                        Func<Type, bool> matchesDictTypeName = delegate(Type type)
-                        {
+                        Func<Type, bool> matchesDictTypeName = delegate (Type type) {
                             // Ignore unloadable types
-                            try
-                            {
+                            try {
                                 return type.Name == dictTypeName;
-                            }
-                            catch (Exception)
-                            {
+                            } catch (Exception) {
                                 return false;
                             }
                         };
@@ -479,9 +434,7 @@ namespace WPFLocalizeExtension.Providers
                     }
 
                     resManager = GetResourceManagerFromType(resourceManagerType);
-                }
-                else
-                {
+                } else {
                     resManager = new ResourceManager(resManagerNameToSearch, assembly);
                 }
 
@@ -492,22 +445,18 @@ namespace WPFLocalizeExtension.Providers
                 // Add the ResourceManager to the cachelist
                 Add(resManKey, resManager);
 
-                try
-                {
+                try {
                     var assemblyLocation = Path.GetDirectoryName(assembly.Location);
 
                     // Get the list of all cultures.
                     var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
-                    
-                    foreach (var c in cultures)
-                    {
+
+                    foreach (var c in cultures) {
                         var rs = resManager.GetResourceSet(c, true, false);
                         if (rs != null)
                             AddCulture(c);
                     }
-                }
-                catch
-                {
+                } catch {
                     // This may lead to problems with Silverlight
                 }
             }
@@ -516,12 +465,10 @@ namespace WPFLocalizeExtension.Providers
             return resManager;
         }
 
-        private ResourceManager GetResourceManagerFromType(Type type)
-        {
+        private ResourceManager GetResourceManagerFromType(Type type) {
             if (type == null)
                 return null;
-            try
-            {
+            try {
                 var propInfo = type.GetProperty(ResourceManagerName, ResourceBindingFlags);
 
                 // get the GET-method from the methodinfo
@@ -529,28 +476,27 @@ namespace WPFLocalizeExtension.Providers
 
                 // cast it to a ResourceManager for better working with
                 return (ResourceManager)methodInfo.Invoke(null, null);
-            }
-            catch
-            {
+            } catch {
                 return null;
             }
         }
-        #endregion
+
+        #endregion ResourceManager management
 
         #region ILocalizationProvider implementation
+
         /// <summary>
         /// Uses the key and target to build a fully qualified resource key (Assembly, Dictionary, Key)
         /// </summary>
         /// <param name="key">Key used as a base to find the full key</param>
         /// <param name="target">Target used to help determine key information</param>
         /// <returns>Returns an object with all possible pieces of the given key (Assembly, Dictionary, Key)</returns>
-        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(String key, DependencyObject target)
-        {
+        public FullyQualifiedResourceKeyBase GetFullyQualifiedResourceKey(String key, DependencyObject target) {
             if (String.IsNullOrEmpty(key))
                 return null;
             String assembly, dictionary;
             ParseKey(key, out assembly, out dictionary, out key);
-            
+
             if (String.IsNullOrEmpty(assembly))
                 assembly = GetAssembly(target);
 
@@ -579,18 +525,14 @@ namespace WPFLocalizeExtension.Providers
         /// Calls the <see cref="ILocalizationProvider.ProviderChanged"/> event.
         /// </summary>
         /// <param name="target">The target object.</param>
-        protected virtual void OnProviderChanged(DependencyObject target)
-        {
-            try
-            {
+        protected virtual void OnProviderChanged(DependencyObject target) {
+            try {
                 var assembly = GetAssembly(target);
                 var dictionary = GetDictionary(target);
 
                 if (!String.IsNullOrEmpty(assembly) && !String.IsNullOrEmpty(dictionary))
                     GetResourceManager(assembly, dictionary);
-            }
-            catch
-            {
+            } catch {
             }
 
             if (ProviderChanged != null)
@@ -603,8 +545,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">The target object.</param>
         /// <param name="key">The key.</param>
         /// <param name="message">The error message.</param>
-        protected virtual void OnProviderError(DependencyObject target, string key, string message)
-        {
+        protected virtual void OnProviderError(DependencyObject target, string key, string message) {
             if (ProviderError != null)
                 ProviderError(this, new ProviderErrorEventArgs(target, key, message));
         }
@@ -615,8 +556,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="key">The key where the value was changed.</param>
         /// <param name="value">The new value.</param>
         /// <param name="tag">A custom tag.</param>
-        protected virtual void OnValueChanged(string key, object value, object tag)
-        {
+        protected virtual void OnValueChanged(string key, object value, object tag) {
             if (ValueChanged != null)
                 ValueChanged(this, new ValueChangedEventArgs(key, value, tag));
         }
@@ -628,8 +568,7 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="target">The target object.</param>
         /// <param name="culture">The culture to use.</param>
         /// <returns>The value corresponding to the source/dictionary/key path for the given culture (otherwise NULL).</returns>
-        public virtual object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture)
-        {
+        public virtual object GetLocalizedObject(string key, DependencyObject target, CultureInfo culture) {
             string assembly;
             string dictionary;
 
@@ -643,20 +582,17 @@ namespace WPFLocalizeExtension.Providers
                 dictionary = GetDictionary(target);
 
             // Final validation of the values.
-            if (String.IsNullOrEmpty(assembly))
-            {
+            if (String.IsNullOrEmpty(assembly)) {
                 OnProviderError(target, key, "No assembly provided.");
                 return null;
             }
 
-            if (String.IsNullOrEmpty(dictionary))
-            {
+            if (String.IsNullOrEmpty(dictionary)) {
                 OnProviderError(target, key, "No dictionary provided.");
                 return null;
             }
 
-            if (String.IsNullOrEmpty(key))
-            {
+            if (String.IsNullOrEmpty(key)) {
                 OnProviderError(target, key, "No key provided.");
                 return null;
             }
@@ -665,19 +601,15 @@ namespace WPFLocalizeExtension.Providers
             ResourceManager resManager;
 
             // try to get the resouce manager
-            try
-            {
+            try {
                 resManager = GetResourceManager(assembly, dictionary);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 OnProviderError(target, key, "Error retrieving the resource manager.\r\n" + e.Message);
                 return null;
             }
 
             // finally, return the searched object as type of the generic type
-            try
-            {
+            try {
                 resManager.IgnoreCase = ignoreCase;
                 var result = resManager.GetObject(key, culture);
 
@@ -685,9 +617,7 @@ namespace WPFLocalizeExtension.Providers
                     OnProviderError(target, key, "Missing key.");
 
                 return result;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 OnProviderError(target, key, "Error retrieving the resource.\r\n" + e.Message);
                 return null;
             }
@@ -697,6 +627,7 @@ namespace WPFLocalizeExtension.Providers
         /// An observable list of available cultures.
         /// </summary>
         public ObservableCollection<CultureInfo> AvailableCultures { get; protected set; }
-        #endregion
+
+        #endregion ILocalizationProvider implementation
     }
 }

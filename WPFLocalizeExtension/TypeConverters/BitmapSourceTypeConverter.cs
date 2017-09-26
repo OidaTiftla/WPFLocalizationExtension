@@ -1,39 +1,40 @@
 ﻿#region Copyright information
+
 // <copyright file="BitmapSourceTypeConverter.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Bernhard Millauer</author>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.TypeConverters
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.TypeConverters {
+
     #region Uses
+
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using System.ComponentModel;
-    using System.Windows;
-    using System.Windows.Media.Imaging;
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.Globalization;
-    #endregion
+    using System.Windows;
+    using System.Windows.Media.Imaging;
+
+    #endregion Uses
 
     /// <summary>
     /// A type converter class for Bitmap resources that are used in WPF.
     /// </summary>
-    public class BitmapSourceTypeConverter : TypeConverter
-    {
+    public class BitmapSourceTypeConverter : TypeConverter {
+
         /// <summary>
         /// Returns whether this converter can convert an object of the given type to the type of this converter, using the specified context.
         /// </summary>
         /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
         /// <param name="sourceType">A <see cref="Type"/> that represents the type you want to convert from.</param>
         /// <returns>true if this converter can perform the conversion; otherwise, false.</returns>
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
-        {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) {
             return ((sourceType != null) && (sourceType.Equals(typeof(System.Drawing.Bitmap))));
         }
 
@@ -43,8 +44,7 @@ namespace WPFLocalizeExtension.TypeConverters
         /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
         /// <param name="destinationType">A <see cref="Type"/> that represents the type you want to convert to.</param>
         /// <returns>true if this converter can perform the conversion; otherwise, false.</returns>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-        {
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) {
             return ((destinationType != null) && (destinationType.Equals(typeof(System.Drawing.Bitmap))));
         }
 
@@ -55,8 +55,7 @@ namespace WPFLocalizeExtension.TypeConverters
         /// <param name="culture">The <see cref="CultureInfo"/> to use as the current culture.</param>
         /// <param name="value">The <see cref="Object"/> to convert.</param>
         /// <returns>An <see cref="Object"/> that represents the converted value.</returns>
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-        {
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
             Bitmap bitmap = value as Bitmap;
 
             if (bitmap == null)
@@ -97,8 +96,7 @@ namespace WPFLocalizeExtension.TypeConverters
         /// <param name="value">The <see cref="Object"/> to convert.</param>
         /// <param name="destinationType">The <see cref="Type"/> to convert the value parameter to.</param>
         /// <returns>An <see cref="Object"/> that represents the converted value.</returns>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
-        {
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
             BitmapSource source = value as BitmapSource;
 
             if (value == null)

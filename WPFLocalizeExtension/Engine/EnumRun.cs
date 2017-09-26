@@ -1,13 +1,15 @@
 ﻿#region Copyright information
+
 // <copyright file="EnumRun.cs">
 //     Licensed under Microsoft Public License (Ms-PL)
 //     http://wpflocalizeextension.codeplex.com/license
 // </copyright>
 // <author>Uwe Mayer</author>
-#endregion
 
-namespace WPFLocalizeExtension.Engine
-{
+#endregion Copyright information
+
+namespace WPFLocalizeExtension.Engine {
+
     using System;
     using System.ComponentModel;
     using System.Windows;
@@ -17,14 +19,15 @@ namespace WPFLocalizeExtension.Engine
     /// <summary>
     /// An extension of <see cref="Run"/> for displaying localized enums.
     /// </summary>
-    public class EnumRun : Run
-    {
+    public class EnumRun : Run {
+
         /// <summary>
         /// Our own <see cref="LocExtension"/> instance.
         /// </summary>
         private LocExtension ext = null;
 
         #region EnumValue property
+
         /// <summary>
         /// The EnumValue.
         /// </summary>
@@ -34,14 +37,15 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.EnumValueProperty"/>
         /// </summary>
         [Category("Common")]
-        public Enum EnumValue
-        {
+        public Enum EnumValue {
             get { return (Enum)GetValue(EnumValueProperty); }
             set { SetValue(EnumValueProperty, value); }
         }
-        #endregion
+
+        #endregion EnumValue property
 
         #region PrependType property
+
         /// <summary>
         /// This flag determines, if the type should be added using the given separator.
         /// </summary>
@@ -51,14 +55,15 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.PrependTypeProperty"/>
         /// </summary>
         [Category("Common")]
-        public bool PrependType
-        {
+        public bool PrependType {
             get { return (bool)GetValue(PrependTypeProperty); }
             set { SetValue(PrependTypeProperty, value); }
         }
-        #endregion
+
+        #endregion PrependType property
 
         #region Separator property
+
         /// <summary>
         /// The Separator.
         /// </summary>
@@ -68,14 +73,15 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.SeparatorProperty"/>
         /// </summary>
         [Category("Common")]
-        public string Separator
-        {
+        public string Separator {
             get { return (string)GetValue(SeparatorProperty); }
             set { SetValue(SeparatorProperty, value); }
         }
-        #endregion
+
+        #endregion Separator property
 
         #region Prefix property
+
         /// <summary>
         /// The Prefix.
         /// </summary>
@@ -85,26 +91,23 @@ namespace WPFLocalizeExtension.Engine
         /// The backing property for <see cref="LocProxy.PrefixProperty"/>
         /// </summary>
         [Category("Common")]
-        public string Prefix
-        {
+        public string Prefix {
             get { return (string)GetValue(PrefixProperty); }
             set { SetValue(PrefixProperty, value); }
         }
-        #endregion
+
+        #endregion Prefix property
 
         /// <summary>
         /// A notification handler for changed properties.
         /// </summary>
         /// <param name="d">The object.</param>
         /// <param name="e">The event arguments.</param>
-        private static void PropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
+        private static void PropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var run = d as EnumRun;
-            if (run != null)
-            {
+            if (run != null) {
                 var value = run.EnumValue;
-                if (value != null)
-                {
+                if (value != null) {
                     var key = value.ToString();
 
                     if (run.PrependType)
@@ -112,13 +115,11 @@ namespace WPFLocalizeExtension.Engine
                     if (!string.IsNullOrEmpty(run.Prefix))
                         key = run.Prefix + run.Separator + key;
 
-                    if (run.ext == null)
-                    {
+                    if (run.ext == null) {
                         run.ext = new LocExtension();
                         run.ext.Key = key;
                         run.ext.SetBinding(run, run.GetType().GetProperty("Text"));
-                    }
-                    else
+                    } else
                         run.ext.Key = key;
                 }
             }

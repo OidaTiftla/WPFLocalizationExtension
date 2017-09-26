@@ -58,7 +58,52 @@ namespace WPFLocalizeExtension.Providers
         /// <param name="args">The event argument.</param>
         private static void AttachedPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
+            UpdateAvailableCultures(obj);
             Instance.OnProviderChanged(obj);
+        }
+
+        /// <summary>
+        /// Searches for all available cultures and adds them to the list.
+        /// </summary>
+        /// <param name="target"></param>
+        private static void UpdateAvailableCultures(DependencyObject target)
+        {
+            var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+
+            var csvDirectory = "Localization";
+            var assembly = Instance.GetAssembly(target);
+            var dictionary = Instance.GetDictionary(target);
+            var csvResourceName = "";
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assemblyInAppDomain in loadedAssemblies) {
+                // check if the name pf the assembly is not null
+                if (assemblyInAppDomain.FullName != null) {
+                    // get the assembly name object
+                    AssemblyName assemblyName = new AssemblyName(assemblyInAppDomain.FullName);
+
+                    // check if the name of the assembly is the seached one
+                    if (assemblyName.Name == assembly) {
+                        // search all available cultures
+                        foreach (var c in cultures) {
+                            csvResourceName = string.Format(".{0}.{1}.csv", csvDirectory, dictionary + (String.IsNullOrEmpty(c.Name) ? "" : "-" + c.Name));
+
+                            csvResourceName = assemblyInAppDomain.GetManifestResourceNames().FirstOrDefault(r => r.Contains(csvResourceName));
+                            if (csvResourceName != null)
+                                Instance.AddCulture(c);
+                        }
+
+                        // add culture invariant
+                        // Take the invariant culture.
+                        csvResourceName = string.Format(".{0}.{1}.csv", csvDirectory, dictionary);
+
+                        csvResourceName = assemblyInAppDomain.GetManifestResourceNames().FirstOrDefault(r => r.Contains(csvResourceName));
+                        if (csvResourceName != null) {
+                            Instance.AddCulture(CultureInfo.InvariantCulture);
+                            Instance.AddCulture(CultureInfo.GetCultureInfo("en"));
+                        }
+                    }
+                }
+            }
         }
         #endregion
 

@@ -70,7 +70,10 @@ namespace WPFLocalizeExtension.Providers
             // add culture invariant
             csvPath = Path.Combine(csvDirectory, dictionary + ".csv");
             if (File.Exists(csvPath))
+            {
                 Instance.AddCulture(CultureInfo.InvariantCulture);
+                Instance.AddCulture(CultureInfo.GetCultureInfo("en"));
+            }
         }
         #endregion
 

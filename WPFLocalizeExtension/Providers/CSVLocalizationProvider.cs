@@ -260,7 +260,7 @@ namespace WPFLocalizeExtension.Providers {
                 // Read each line and split it.
                 while (!reader.EndOfStream) {
                     var line = reader.ReadLine();
-                    var parts = line.Split(";".ToCharArray());
+                    var parts = line.Split(";,".ToCharArray());
 
                     if (parts.Length < 2)
                         continue;

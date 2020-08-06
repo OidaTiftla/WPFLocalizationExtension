@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WPFLocalizeExtension</RootNamespace>
     <AssemblyName>WPFLocalizeExtension</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -82,7 +82,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="XAMLMarkupExtensions, Version=1.9.0.0, Culture=neutral, PublicKeyToken=c726e0262981a1eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\XAMLMarkupExtensions.1.9.0\lib\net452\XAMLMarkupExtensions.dll</HintPath>
+      <HintPath>..\packages\XAMLMarkupExtensions.1.9.0\lib\net48\XAMLMarkupExtensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
